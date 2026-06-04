@@ -276,7 +276,7 @@ void viewHistory()
             break;
             
             found=1;
-            System.out.println("Product Name: "+hisName[`i]+"\nProduct Quantity: "+quantity[i]+"\nProduct Status: "+status[i]+"\nProduct Bill: "+price[i]);
+            System.out.println("Product Name: "+hisName[i]+"\nProduct Quantity: "+quantity[i]+"\nProduct Status: "+status[i]+"\nProduct Bill: "+price[i]);
            
 
     }
