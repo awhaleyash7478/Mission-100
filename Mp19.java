@@ -214,7 +214,7 @@ class Hospital {
         for (int i = 0; i < max; i++) {
             if (dischargeId == id[i]) {
                 found = 1;
-                if (status[i].equals("under treatment")) {
+                if (status[i].equals("under treatment")||(status[i].equals("Under Treatment"))) {
                     
                     hisStatus[hisIndex]=status[i];
                     TreatmentThread t=new TreatmentThread();

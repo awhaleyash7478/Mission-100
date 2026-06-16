@@ -171,7 +171,7 @@ break;
                          
                           hisIssueStatus[j]="Issued";
                           hisIssueBookId[j]=bookId[j];
-                                  if(hisIssueBookId[j]==tempBookId){
+                                  if(hisIssueBookId[j]==hisissueMemberId[j]){
                             System.out.println("U cannot issue same book twice");
                             return;
                            
