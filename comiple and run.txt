@@ -1,2 +1,2 @@
-javac -cp ".;lib\mysql-connector-j-9.7.0.jar" Mp29.java
-java -cp ".;lib\mysql-connector-j-9.7.0.jar" Mp29
+javac -cp ".;lib\mysql-connector-j-9.7.0.jar" Mp30.java
+java -cp ".;lib\mysql-connector-j-9.7.0.jar" Mp30
