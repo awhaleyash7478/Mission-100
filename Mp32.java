@@ -5,6 +5,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+
+class NotificationThread extends Thread
+{
+    
+    Restaurant obj;
+    NotificationThread(Restaurant obj)
+    {
+        this.obj=obj;
+    }
+    public void run()
+    {
+        try 
+        {
+            System.out.println("Order confirmed");
+            Thread.sleep(2000);
+            System.out.println("Food is being prepared");
+            
+     
+}
+
+            
+
+        
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
 class RestaurantAcceptanceThread extends Thread
 {
     public void run()
@@ -14,11 +43,48 @@ class RestaurantAcceptanceThread extends Thread
 }
 class DeliveryAssignmentThread extends Thread
 {
-    
-    public void run()
+    Connection conn;
+    Restaurant obj;
+    DeliveryAssignmentThread(Connection conn,Restaurant obj)
     {
+        this.conn=conn;
+        this.obj=obj;
+        
 
     }
+
+    public void run()
+    {
+        try 
+        {
+            int tempID=0;
+            String query="select * from delivery_partner where status='free'";
+            
+
+            PreparedStatement ps=conn.prepareStatement(query);
+            String tempStatus="busy";
+            
+            ResultSet rs=ps.executeQuery();
+            if(rs.next())
+                 tempID=rs.getInt("partner_id");
+            String sql = "UPDATE delivery_partner SET status='busy' WHERE partner_id=?";
+            PreparedStatement ps1=conn.prepareStatement(sql);
+            ps1.setInt(1, tempID);
+            ps1.executeUpdate();
+            System.out.println("delivery assigned");
+            obj.status="delivered";
+      
+                
+                
+            
+        }
+
+
+    catch(Exception e)
+    {
+        e.printStackTrace();
+    }
+}
 }
 class  PaymentProcessingThread  extends Thread 
 {
@@ -44,14 +110,11 @@ class  PaymentProcessingThread  extends Thread
 
     }
 }
-class  RestaurantAcceptanceThread extends Thread 
-{
 
-
-}
 
 class Restaurant 
 {
+
     Connection conn;
     Restaurant(Connection conn)
     {
@@ -72,10 +135,13 @@ class Restaurant
     {
         System.out.println("Enter the customer id:");
         cusId=sc.nextInt();
+        sc.nextLine();
         System.out.println("Enter the customer name:");
         cusName=sc.nextLine();
+
         System.out.println("Enter the customer mobile number:");
         mobNo=sc.nextInt();
+        sc.nextLine();
         System.out.println("Enter the customer address:");
         cusAdd=sc.nextLine();
     }catch(Exception e)
@@ -109,9 +175,10 @@ class Restaurant
         try 
         {
             int found=0;
-            String query="select * from customers where customers";
+            String query="select * from customers";
             PreparedStatement ps=conn.prepareStatement(query);
             ResultSet rs=ps.executeQuery();
+          
             while (rs.next()) {
                                    System.out.printf(
                         "%-8d %-15s %-8d %-15s%n",
@@ -143,19 +210,15 @@ double subtotal=0.0,tempSubTotal=0.0;
 double tempPrice=0.0;
 int cusId=0;
 int tempResID=0;
+int tempOrderID=0;
 int tempQuantity=0;
+int DatabaseStock=0;
 try 
         {
             
             while (true) {
-System.out.println("Type 'exit' for exiting:");
-exit=sc.nextLine();
-if(exit.equals("exit"))
-{
-    System.out.println("Thankyou for ordering");
 
-    return;
-}
+
                 String query="select * from menu";
                 PreparedStatement ps=conn.prepareStatement(query);
                 ResultSet rs=ps.executeQuery();
@@ -172,7 +235,8 @@ if(exit.equals("exit"))
 tempResID=rs.getInt("restaurant_id");
 tempQuantity=rs.getInt("stock");
     tempPrice=rs.getInt("price");
-                        System.out.println("----xxxxx----");
+    DatabaseStock=rs.getInt("stock");
+                        
 
 
                     
@@ -196,7 +260,8 @@ int tempFound=0;
 
 
             
-          
+            System.out.println("Enter the order id:");
+            tempOrderID=sc.nextInt();
             System.out.println("Enter the quantity:");
             quantity=sc.nextInt();
             if(quantity>tempQuantity)
@@ -204,13 +269,46 @@ int tempFound=0;
                 System.out.println("out of stock");
                 break;
             }
+            DatabaseStock-=quantity;
             tempSubTotal=quantity*tempPrice;
-            System.out.println("Total Amount:"+subtotal);
-            System.out.println("Enter the the subtotal:");
+            String sql="update menu set stock=? where item_id=?";
+            PreparedStatement pp=conn.prepareStatement(sql);
+            pp.setInt(1, DatabaseStock);
+            pp.setInt(2, order_item_id);
+            pp.executeUpdate();
+
+            System.out.println("Total Amount:"+tempSubTotal);
+            System.out.println("Enter the amount");
             subtotal=sc.nextDouble();
+            if(subtotal!=tempSubTotal)
+            {
+                System.out.println("Please enter the given amount only");
+                break;
+            }
             System.out.println("Enter the customer id:");
             cusId=sc.nextInt();
             status="Ordered";
+            
+            PaymentProcessingThread p=new PaymentProcessingThread(this);
+            p.start();
+            p.join();
+            RestaurantAcceptanceThread r=new RestaurantAcceptanceThread();
+            r.start();
+                  NotificationThread n=new NotificationThread(this);
+            n.start();
+            n.join();
+            DeliveryAssignmentThread d=new DeliveryAssignmentThread(conn, this);
+           d.start();
+           d.join();
+           
+      
+               
+          
+
+            
+            break;
+            
+            
                 }else 
                 {
                     System.out.println("Item not exists");
@@ -224,18 +322,20 @@ return;
         }
         try 
         {
-            String query="insert into orders(customer_id,restaurant_id,total_amount,status)values(?,?,?,?)";
+            String query="insert into orders(order_id,customer_id,restaurant_id,total_amount,status)values(?,?,?,?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setInt(1, cusId);
-            ps.setInt(2, tempResID);
-            ps.setDouble(3, subtotal);
-            ps.setString(4, status);
+            ps.setInt(1, tempOrderID);
+            ps.setInt(2, cusId);
+            ps.setInt(3, tempResID);
+            ps.setDouble(4, subtotal);
+            ps.setString(5, status);
 
 
             int rows=ps.executeUpdate();
            if(rows>0)
            {
             System.out.println("Order placed successfully");
+        
            }else 
            {
             System.out.println("Something went wrong");
@@ -247,14 +347,46 @@ return;
             e.printStackTrace();
         }
     }
-    void trackOrder()
+    void viewOrderHistory()
     {
+        try 
+        {
+            System.out.println("Enter the customer id:");
+            int tempCusID=sc.nextInt();
 
+            String query="select * from orders where customer_id=? ";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setInt(1, tempCusID);
+            int found=0;
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                                   System.out.printf(
+    "%-8d %-15d %-15s %-10.2f %-15s%n",
+    rs.getInt("order_id"),
+    rs.getInt("customer_id"),
+    rs.getInt("restaurant_id"),
+    rs.getDouble("total_amount"),
+    rs.getString("status"));
+                        
+                found = 1;
 
+                
+            }
+            if(found==0)
+            {
+                System.out.println("No such order exist");
+            }
+        }catch(Exception e)
+        
+        {
+            e.printStackTrace();
+        }
     }
+    
 
     void menu()
     {
+        int tempPass=0;
         final int pass=7478;
         while(true){
             System.out.println("1.Admin Panel\n2.Customer Panel\n3.Exit");
@@ -264,7 +396,11 @@ return;
                 try 
                 {
                 System.out.println("Enter the password:");
-                int tempPass=sc.nextInt();
+                 tempPass=sc.nextInt();
+                }catch(Exception e)
+                {
+                    System.out.println("Invalid entry");
+                }
                 if(tempPass==pass)
                 {
                      adminMenu();
@@ -274,15 +410,15 @@ return;
                     System.out.println("Invalid password");
                     return;
                 }
-            }catch(Exception e)
-            {
-                System.out.println("invalid entry");
-            }
+            
         }
         else if (ch==2)
         {
             int choice=0;
-            System.out.println("1.Register Customers\n2.Place Order\n3.Track Order\n4.View Order History\n5.View Customers\n6..Exit");
+            while (true) {
+                
+            
+            System.out.println("1.Register Customers\n2.Place Order\n3.View Order History\n4.View Customers\n5.Exit");
             try {
             choice=sc.nextInt();
             }catch(Exception e)
@@ -297,22 +433,21 @@ return;
                 case 2:
                     placeOrder();
                     break;
+               
                 case 3:
-                    trackOrder();
+                    viewOrderHistory();
                     break;
                 case 4:
-                    //viewOrderHistory();
-                    break;
-                case 5:
                     viewCustomers();
                     break;
-                case 6:
+                case 5:
                     return;
 
             
                 default:
                     System.out.println("Invalid choice");
                     break;
+            }
             }
         }
         else if(ch==3)
@@ -324,6 +459,7 @@ return;
             System.out.println("Invalid entry");
         }
         }
+    
     }
     void addRestaurant()
     {
@@ -376,7 +512,7 @@ return;
           
           while (rs.next()) {
                  System.out.printf(
-                        "%-8d %-15s %-15s %.2f%n",
+                        "%-8d %-15s %-15s%n",
                         rs.getInt("restaurant_id"),
                         rs.getString("restaurant_name"),
                         rs.getString("location"));
@@ -465,7 +601,7 @@ return;
     rs.getString("item_name"),
     rs.getDouble("price"),
     rs.getInt("stock"));
-                        System.out.println("----xxxxx----");
+                        
                 found = 1;
             
             
@@ -554,6 +690,39 @@ return;
         e.printStackTrace();
     }
 }
+void viewAllOrderHistory()
+{
+    try 
+    {
+        String query="select * from orders";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ResultSet rs=ps.executeQuery();
+        int found=0;
+        while(rs.next())
+
+        {
+            
+                   System.out.printf(
+    "%-8d %-15d %-15s %-10.2f %-15s%n",
+    rs.getInt("order_id"),
+    rs.getInt("customer_id"),
+    rs.getInt("restaurant_id"),
+    rs.getDouble("total_amount"),
+    rs.getString("status"));
+                        System.out.println("----xxxxx----");
+                found = 1;
+
+        }
+        if(found==0)
+        {
+            System.out.println("No more orders");
+        }
+    }catch(Exception e)
+    {
+        e.printStackTrace();
+    }
+
+}
     void adminMenu()
     {
         while (true) {
@@ -561,7 +730,7 @@ return;
         
         System.out.println("Welcome to admin panel...");
         int ch=0;
-        System.out.println("1.Add Restaurant\n2.View Restaurant\n3.Add Food item\n4.View Food Item\n5.Search food item\n6.Track Order\n7.View Order History\n8.Add Delivery Partner\n9.Exit");
+        System.out.println("1.Add Restaurant\n2.View Restaurant\n3.Add Food item\n4.View Food Item\n5.Search food item\n6.View Order History\n7.Add Delivery Partner\n8.Exit");
         try 
         {
             ch=sc.nextInt();
@@ -586,16 +755,14 @@ return;
             case 5:
                 searchFoodItem();
                 break;
+            
             case 6:
-               // trackOrder();
+                viewAllOrderHistory();
                 break;
             case 7:
-                //viewAllOrdersHistory();
-                break;
-            case 8:
                 addDeliveryPartner();
                 break;
-            case 9:
+            case 8:
                 return;
             
         
