@@ -8,13 +8,15 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Customers {
-Connection conn;
-    public Customers(Connection conn)
+private Connection conn;
+private Scanner sc;
+    public Customers(Connection conn,Scanner sc)
     {
         this.conn=conn;
+        this.sc=sc;
     }
     String status;
-    Scanner sc = new Scanner(System.in);
+    
 
 public void registerCustomers()
 {
@@ -61,6 +63,7 @@ if(rows>0)
 }
 public void bookRide()
 {
+    int flag=0;
     int bookCusID=0;
     int pickup=0;
     String startLocation=null;
@@ -78,6 +81,20 @@ int xCoordinates2=0;
     {
     System.out.println("Enter the Customer id:");
       bookCusID=sc.nextInt();
+      String check="select * from ridingcustomers where cusID=?";
+      PreparedStatement pc=conn.prepareStatement(check);
+      pc.setInt(1, bookCusID);
+      ResultSet rc=pc.executeQuery();
+      if(rc.next())
+      {
+
+      flag=1;
+      }else if(flag==0) 
+      {
+        System.out.println("Pls register Yourself first...!");
+        
+        return;
+      }
 
     String query="select location_id,location_name from locations";
     PreparedStatement ps=conn.prepareStatement(query);
@@ -126,6 +143,11 @@ int xCoordinates2=0;
     }
       System.out.println("select the destination:");
     destination=sc.nextInt();
+    if(pickup==destination)
+    {
+        System.out.println("Pickup and destination cant be same...!");
+        return;
+    }
     }catch(Exception e)
     {
         System.out.println("PLease enter the location id only");
@@ -241,6 +263,7 @@ void viewRideHistory()
     public void menu() {
         int ch = 0;
         while (true) {
+            System.out.println("WELCOME TO A.EMPIRES ");
             System.out.println("1.Register Customer\n" +
 
                     "2.Book Ride\n" +
@@ -252,6 +275,7 @@ void viewRideHistory()
                 System.out.println("Invalid entry please enter the digitds only");
             }
             switch (ch) {
+                
                 case 1:
                     registerCustomers();
                     break;
