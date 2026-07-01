@@ -1,0 +1,2 @@
+javac -cp "..\lib\mysql-connector-j-9.7.0.jar;." app\Main.java model\*.java
+java -cp ".;..\lib\mysql-connector-j-9.7.0.jar" app.Main
