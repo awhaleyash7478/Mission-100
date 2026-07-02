@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class Customers {
 private Connection conn;
 private Scanner sc;
+  int bookCusID=0;
     public Customers(Connection conn,Scanner sc)
     {
         this.conn=conn;
@@ -64,7 +65,7 @@ if(rows>0)
 public void bookRide()
 {
     int flag=0;
-    int bookCusID=0;
+  
     int pickup=0;
     String startLocation=null;
     String endLocation=null;
@@ -79,8 +80,16 @@ int xCoordinates2=0;
     int found=0;
     try 
     {
+        try 
+        {
     System.out.println("Enter the Customer id:");
       bookCusID=sc.nextInt();
+        }catch(Exception e)
+        {
+            System.out.println("Pls enter the valid id");
+            sc.nextLine();
+        }
+
       String check="select * from ridingcustomers where cusID=?";
       PreparedStatement pc=conn.prepareStatement(check);
       pc.setInt(1, bookCusID);
@@ -190,11 +199,14 @@ int xCoordinates2=0;
     status="Booked";
     
 
+   DriverAssignmentThread d=new DriverAssignmentThread(conn,this);
+     d.start();
+     d.join();
 
     String s="insert into rides(customer_id,driver_id,pickup,destination,fare,status)values(?,?,?,?,?,?)";
     PreparedStatement p=conn.prepareStatement(s);
     p.setInt(1, bookCusID);
-    p.setInt(2, driverId);
+    p.setInt(2, d.assignDriId);
     p.setString(3,startLocation );
     p.setString(4, endLocation);
     p.setDouble(5, fare);
@@ -202,6 +214,9 @@ int xCoordinates2=0;
         int rows=p.executeUpdate();
         if(rows>0)
         {
+         
+          
+           
             System.out.println("Ride booked successfully");
         
         
@@ -233,13 +248,15 @@ void viewRideHistory()
         {
             System.out.println("Pls enter the valid id");
         }
-        String query="select * from rides where customer_id=? ";
-        PreparedStatement ps=conn.prepareStatement(query);
+       String query="select * from rides where customer_id=? ";
+       //String query="select * from rides"; 
+       PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, tempCusID);
         ResultSet rs=ps.executeQuery();
              System.out.printf("%-8s %-12s %-10s %-15s %-15s %-10s %-15s%n",
         "RideID", "CustomerID", "DriverID", "Pickup", "Destination", "Fare", "Status");
         while (rs.next()) {
+           
        
         System.out.printf("%-8d %-12d %-10d %-15s %-15s %-10.2f %-15s%n",
         rs.getInt("ride_id"),
