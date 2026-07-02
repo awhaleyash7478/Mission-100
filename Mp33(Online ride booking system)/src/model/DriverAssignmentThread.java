@@ -19,6 +19,8 @@ public class DriverAssignmentThread extends Thread{
 public void run()
 {
     
+    
+    
     try
     {
         String tempStatus="free";
@@ -29,10 +31,18 @@ public void run()
         if(rs.next())
         {
         assignDriId=rs.getInt("driver_id");
+        obj.status="busy";
+        System.out.println("\t\t\t|Ride booked successfully|");
+        obj.status="free";
+      
+        
+     
+
+  
         
         }else 
         {
-            System.out.println("Sorry all drivers are busy");
+            System.out.println("\t\t\t|Sorry all drivers are busy|");
         System.exit(0);
         }
        

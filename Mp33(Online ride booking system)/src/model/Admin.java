@@ -16,6 +16,7 @@ public class Admin {
     }
     public void registerDriver()
     {
+        int rows=0;
         int driID=0;
         String driName=null;
         String vehicle=null;
@@ -33,6 +34,10 @@ public class Admin {
         }catch(Exception e)
         {
             System.out.println("Invalid entry");
+            
+            sc.nextLine();
+            return;
+
         }
         try 
         {
@@ -42,8 +47,16 @@ ps.setInt(1, driID);
 ps.setString(2, driName);
 ps.setString(3, vehicle);
 ps.setString(4, status);
-int rows=ps.executeUpdate();
-if(rows>0)
+try 
+{
+rows=ps.executeUpdate();
+
+}
+catch(Exception e)
+{
+System.out.println("Driver with this id already exists");
+return;
+}if(rows>0)
 {
     System.out.println("Driver registered successfully");
 }else 

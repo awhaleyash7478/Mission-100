@@ -17,6 +17,7 @@ private Scanner sc;
         this.sc=sc;
     }
     String status;
+    String rideStatus;
     
 
 public void registerCustomers()
@@ -38,17 +39,28 @@ public void registerCustomers()
     }catch(Exception e)
     {
         System.out.println("Invalid entry");
+        sc.nextLine();
         return;
     }
     try 
     {
 String query="insert into ridingCustomers(cusID,cusName,cusMob)values(?,?,?)";
 PreparedStatement ps=conn.prepareStatement(query);
+
 ps.setInt(1, cusId);
+
+int rows=0;
 ps.setString(2, cusName);
 ps.setLong(3, mobNo);
-int rows=ps.executeUpdate();
-if(rows>0)
+try 
+{
+ rows=ps.executeUpdate();
+
+}catch(Exception e)
+{
+    System.out.println("customer with this id or mob number already exists");
+    return;
+}if(rows>0)
 {
     System.out.println("You are registered successfully...");
 }else 
@@ -196,12 +208,13 @@ int xCoordinates2=0;
     fare=distance*15;
 
     
-    status="Booked";
+    rideStatus="Booked";
     
 
    DriverAssignmentThread d=new DriverAssignmentThread(conn,this);
      d.start();
-     d.join();
+    d.join();
+      rideStatus="completed";
 
     String s="insert into rides(customer_id,driver_id,pickup,destination,fare,status)values(?,?,?,?,?,?)";
     PreparedStatement p=conn.prepareStatement(s);
@@ -210,14 +223,15 @@ int xCoordinates2=0;
     p.setString(3,startLocation );
     p.setString(4, endLocation);
     p.setDouble(5, fare);
-    p.setString(6,status);
+    p.setString(6,rideStatus);
         int rows=p.executeUpdate();
+        int flag2=0;
         if(rows>0)
         {
-         
+         flag2=1;
           
            
-            System.out.println("Ride booked successfully");
+         
         
         
         }else
@@ -248,7 +262,7 @@ void viewRideHistory()
         {
             System.out.println("Pls enter the valid id");
         }
-       String query="select * from rides where customer_id=? ";
+       String query="select ride_id ,customer_id,driver_id,pickup,destination,fare from rides where customer_id=? ";
        //String query="select * from rides"; 
        PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, tempCusID);
@@ -258,14 +272,14 @@ void viewRideHistory()
         while (rs.next()) {
            
        
-        System.out.printf("%-8d %-12d %-10d %-15s %-15s %-10.2f %-15s%n",
+        System.out.printf("%-8d %-12d %-10d %-15s %-15s %-10.2f %n",
         rs.getInt("ride_id"),
         rs.getInt("customer_id"),
         rs.getInt("driver_id"),
         rs.getString("pickup"),
         rs.getString("destination"),
-        rs.getDouble("fare"),
-        rs.getString("status"));
+        rs.getDouble("fare"));
+       
 
 
             
