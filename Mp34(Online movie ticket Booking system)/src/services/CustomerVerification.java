@@ -11,9 +11,11 @@ import threads.*;
 public class CustomerVerification {
     Scanner sc;
     Connection conn;
+    MovieSelection m;
     public int otpgenerated;
-   public CustomerVerification(Scanner sc,Connection conn)
+   public CustomerVerification(Scanner sc,Connection conn,MovieSelection m)
     {
+        this.m=m;
         this.sc=sc;
         this.conn=conn;
     }
@@ -57,14 +59,16 @@ public class CustomerVerification {
             if(rows>0)
                 {
                     System.out.println("Login Successfull");
+                    m.menu();
+                    
+
 
                 } else 
                     {
                         System.out.println("Unable to Login");
                           return;
                     }  
-                
-//Todo: process after login
+    
 
 
             }
@@ -89,6 +93,24 @@ public class CustomerVerification {
         
             System.out.println("Enter the password:");
             password=sc.nextLine();
+            System.out.println("1.Confirm Password\n2.Re-enter Password");
+            int choice=0;
+            try 
+            {
+                choice=sc.nextInt();
+                sc.nextLine();
+            }catch(Exception e)
+            {
+                System.out.println("Invalid choice");
+                return;
+            }
+            
+            if(choice==2)
+            {
+                System.out.println("Enter the password:");
+            password=sc.nextLine();
+                
+            }
 
            System.out.println("Enter the mobile number:");
             mobNo = sc.next();
@@ -117,15 +139,12 @@ if (!mobNo.matches("[7-9][0-9]{9}")) {
             
             ps.setString(3, password);
             int rows=ps.executeUpdate();
-            if(rows>0)
+            if(rows<0)
                 {
-                    System.out.println("Acoount Registered Successfully");
+                    System.out.println("Unable to register");
+                    return;
 
-                } else 
-                    {
-                        System.out.println("Unable to Register");
-                          return;
-                    }  
+                } 
             
            }
             
@@ -150,7 +169,8 @@ int flag=0;
 if(OTP==otpgenerated)
 {
     flag=1;
-
+    System.out.println("Account registered successfully 😊");
+m.menu();
 }else if(flag==0) 
 {
     System.out.println("Invalid otp");

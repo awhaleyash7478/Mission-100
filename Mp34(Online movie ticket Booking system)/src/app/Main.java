@@ -19,7 +19,10 @@ public class Main {
                     "Yash@7478");
                     
             System.out.println("connection established successfully");
-            CustomerVerification l=new CustomerVerification(sc,conn);
+              MovieSelection m=new MovieSelection(sc,conn);
+            CustomerVerification l=new CustomerVerification(sc,conn,m);
+          
+
             l.menu();
             
                 
