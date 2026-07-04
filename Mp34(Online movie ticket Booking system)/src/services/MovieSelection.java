@@ -13,6 +13,8 @@ Connection conn;
     this.sc=sc;
     this.conn=conn;
 }
+public int movieID;
+
  
 public void viewMovies()
 {
@@ -46,10 +48,58 @@ if(found==0)
     System.out.println("No movies available");
     return;
 }
+movieSelection();
+
 }catch(SQLException e)
 {
     e.printStackTrace();
 }
+}
+public void movieSelection()
+{
+    
+    String movieName=null;
+    int duration=0;
+    String language=null;
+    try 
+    {
+        System.out.println("Enter the movie id:");
+        movieID=sc.nextInt();
+        sc.nextLine();
+    }catch(Exception e)
+    {
+        System.out.println("pls enters the digit only");
+            return;
+    }
+    try
+    {
+        String query="select * from movies where movie_id=? and status='Running'";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setInt(1, movieID);
+       
+        ResultSet rs=ps.executeQuery();
+        if(rs.next())
+        {
+         movieName=rs.getString("movie_name");
+          duration=rs.getInt("duration");
+         
+          language=rs.getString("language");
+        
+
+            System.out.println("Selected movie: "+movieName+"\nLanguage: "+language+"\nDuration: "+duration);
+
+            TheatreSelection t=new TheatreSelection(conn, sc,this);
+    
+      t.viewTheatre();
+        }else 
+        {
+            System.out.println("No such movie available");
+            return;
+        }
+    }catch(SQLException e)
+    {
+        e.printStackTrace();
+    }
 }
     public void menu()
     {
