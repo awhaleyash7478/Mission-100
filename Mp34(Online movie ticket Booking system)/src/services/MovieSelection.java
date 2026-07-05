@@ -8,11 +8,17 @@ import java.util.Scanner;
 public class MovieSelection {
 Scanner sc;
 Connection conn;
-   public  MovieSelection(Scanner sc,Connection conn)
+ShowSelection s;
+
+   public  MovieSelection(Scanner sc,Connection conn,ShowSelection s)//TheatreSelection t)
 {
+   // this.t=t;
     this.sc=sc;
     this.conn=conn;
+    this.s=s;
 }
+
+
 public int movieID;
 
  
@@ -88,7 +94,7 @@ public void movieSelection()
 
             System.out.println("Selected movie: "+movieName+"\nLanguage: "+language+"\nDuration: "+duration);
 
-            TheatreSelection t=new TheatreSelection(conn, sc,this);
+           TheatreSelection t=new TheatreSelection(conn, sc,this,s);
     
       t.viewTheatre();
         }else 

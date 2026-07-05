@@ -11,98 +11,51 @@ public class TheatreSelection {
     Connection conn;
     Scanner sc;
     MovieSelection m;
-    public TheatreSelection(Connection conn,Scanner sc,MovieSelection m)
+    ShowSelection obj;
+    public TheatreSelection(Connection conn,Scanner sc,MovieSelection m,ShowSelection obj)
     {
         this.conn=conn;
         this.sc=sc;
         this.m=m;
+       
     }
+     int theatreID=0;
     
+     
+  
     public void viewTheatre()
-    {int showTheatreid=0;
+    {
 
       try {
         
-        String query="select * from  shows where movie_id =?";
-        PreparedStatement ps1=conn.prepareStatement(query);
         
-        ps1.setInt(1, m.movieID);
-        System.out.println("movieid:"+m.movieID);
-        
-        ResultSet rs1=ps1.executeQuery();
-        if(rs1.next())
-        {
-     showTheatreid=rs1.getInt("theatre_id");
-        }
+     String query="select theatres.theatre_id,theatres.theatre_name,theatres.location from shows join theatres on shows.theatre_id=theatres.theatre_id where movie_id=?";
 
+      PreparedStatement ps=conn.prepareStatement(query);
+     ps.setInt(1, m.movieID);
+      ResultSet rs=ps.executeQuery();
+      int found=0;
       
+      System.out.printf("-------------------------------------------------------%n");
+      System.out.println("Theatres currently Screening the movie");
+      System.out.printf("-------------------------------------------------------%n");
       
-         
-        String sql="select * from theatres where theatre_id=? ";
-        PreparedStatement ps=conn.prepareStatement(sql);
-           
-         System.out.println("showTheatreid = " + showTheatreid);
-          ps.setInt(1, showTheatreid);
-        ResultSet rs = ps.executeQuery();
-        ArrayList<String[]> theatres = new ArrayList<>();
-
-        int found=0;
+System.out.printf("%-10s %-30s %-20s%n",
+        "ID", "Theatre Name", "Location");
 while (rs.next()) {
-    theatres.add(new String[] {
-      
-        String.valueOf(rs.getInt("theatre_id")),
-        rs.getString("theatre_name"),
-        rs.getString("location")
-        
-    });
-    found=1;
-
-
-}
-if(found==0)
-{
-  System.out.println("No theatres found");
-}
-for (String[] theatre : theatres) {
-    System.out.printf("%-10s %-25s %-20s%n",
-            theatre[0],   // theatre_id
-            theatre[1],   // theatre_name
-            theatre[2]);  // location
-}
-
-       /*  System.out.println();
-        System.out.println();
-        
-        System.out.printf("%-12s %-25s %-20s%n",
-        "Theatre ID",
-        "Theatre Name",
-        "Location");
-            System.out.printf("------------------------------------------------------\n");
-
-        int found=0;
-        while (rs2.next()) {
-          
-          
-          
-          
-          found=1;
-          System.out.printf("%-12d %-25s %-20s%n",
+  found=1;
+ System.out.printf("%-10d %-30s %-20s%n",
         rs.getInt("theatre_id"),
         rs.getString("theatre_name"),
         rs.getString("location"));
-
-          
-        }
-        if(found==0)
-        {
-          System.out.println("Theatres not found");
-          return;
-        }
-        theatreSelection();
-      } catch (SQLException e) {
-        e.printStackTrace();
+}
+      System.out.printf("-------------------------------------------------------%n");
+      theatreSelection();
+      if(found==0)
+      {
+        System.out.println("No theatres Screening the mentioned movie");
       }
-      */
+
     }catch(SQLException e)
     {
       e.printStackTrace();
@@ -110,7 +63,6 @@ for (String[] theatre : theatres) {
   }
     public void theatreSelection()
  {
-   int theatreID=0;
   
   try 
   {
@@ -139,6 +91,8 @@ for (String[] theatre : theatres) {
 
        
          System.out.println("Theatre selected: "+theatreName+"\nLocation: "+location);
+         ShowSelection s=new ShowSelection(conn, m, this, sc);
+         s.menu();
        }else 
        {
         System.out.println("No such Theatre found");

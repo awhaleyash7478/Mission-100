@@ -7,6 +7,11 @@ import java.util.Scanner;
 
 import  services.*;
 public class Main {
+   static ShowSelection obj;
+    public Main(ShowSelection obj)
+    {
+        this.obj=obj;
+    }
     public static void main(String[]args)
     {
         
@@ -19,7 +24,7 @@ public class Main {
                     "Yash@7478");
                     
             System.out.println("connection established successfully");
-              MovieSelection m=new MovieSelection(sc,conn);
+              MovieSelection m=new MovieSelection(sc,conn,obj);
             CustomerVerification l=new CustomerVerification(sc,conn,m);
           
 
