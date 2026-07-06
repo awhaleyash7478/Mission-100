@@ -6,12 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 import javax.naming.spi.DirStateFactory.Result;
 
 public class ShowSelection {
-   
+   int seatno;
+   int removed=0;
     Scanner sc;
+    int tempRemoved;
     Connection conn;
     MovieSelection obj;
     TheatreSelection obj2;
@@ -112,33 +116,131 @@ System.out.println("------------------------------------------------------------
      public void seatLayout()
      {
         int value=1;
-        int seat=2;
+       // int seat=2;
+
         System.out.println();
         
      
-      System.out.println("\t---------------------------");
+      
+      System.out.println("\t=======================================================================\n");
+      System.out.println("\t\t\t\t--------");
+   
+      System.out.println("\t\t\t\t|SCREEN|");
+      
+
+      System.out.println("\t\t\t\t--------");
+      System.out.println("\t=======================================================================\n");
+      
+      int book=3;
+     
+        ArrayList<Integer> storedSeats=new ArrayList<>();
+ char alphabet='A';
+
+
+               try{
+            String query="select * from bookSeats";
+                PreparedStatement ps=conn.prepareStatement(query);
+                ResultSet rs=ps.executeQuery();
+              
+                while (rs.next()) {
+                    storedSeats.add(rs.getInt("seat_no"));
+                    
+                }
+                
+                 Collections.sort(storedSeats);
+
+ 
+
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        int tempValue=0;
         for(int i=0;i<5;i++)
       {
+       
         System.out.print("\t");
-
-        for(int j=0;j<5;j++)
+        System.out.print(alphabet++);
+        
+        int tempSeat=0;
+       
+        for(int j=0;j<10;j++)
         {
+               
+                
+                
+                
+                      
+             if(i==0)
+                      {
+                      
+
+             if(!storedSeats.isEmpty()&&storedSeats.get(0)<=10&&value==storedSeats.get(0)) 
+              removed= storedSeats.remove(0);
+           
+            }else if(i==1)
+            {
+           
+
+               if(!storedSeats.isEmpty()&&storedSeats.get(0)<=20&&value==storedSeats.get(0)) 
+              removed= storedSeats.remove(0);
+           
+
+            }else if(i==2)
+            {
+           
+
+               if(!storedSeats.isEmpty()&&storedSeats.get(0)<=30&&value==storedSeats.get(0)) 
+              removed= storedSeats.remove(0);
+            }else if(i==3)
+            {
+           
+
+               if(!storedSeats.isEmpty()&&storedSeats.get(0)<=40&&value==storedSeats.get(0)) 
+              removed= storedSeats.remove(0);
+
+            }else if(i==4) 
+            {
+
+
+
+               if(!storedSeats.isEmpty()&&storedSeats.get(0)<=50&&value==storedSeats.get(0)) 
+              
+              {  removed= storedSeats.remove(0);
+                tempRemoved=removed;
+      
+              }}
+      
+            
             
 
-            if(seat==value)
+            if(removed==value)
             {
-                System.out.print("[x]"+" ");
-            }else 
+               
+                System.out.print("  "+"[X]"+" ");
+            }else if(book==value)
+                {
+                    System.out.print(" "+"[V]"+" ");
+                }else 
             {
-                System.out.print("["+value+"]"+" ");
+                System.out.print("  "+"["+value+"]"+" ");
             }
+            
            
-            value ++;
+           value ++;
+           tempValue=value;
         }
+         System.out.println();
          System.out.println();
         
       }
-            System.out.println("\t---------------------------");
+            System.out.print("\t=======================================================================\n");
+            System.out.println("\t[X] Booked");
+            System.out.println("\t[V] Your selection");
+            System.out.println("\t[ ] Avaiilable");  
+            System.out.println("\t=======================================================================\n");
+
+          bookSeats();  
 
      }
      public void bookSeats()
@@ -147,17 +249,58 @@ System.out.println("------------------------------------------------------------
 
         try 
         {
-            System.out.println("Enter the number of seats:");
+            System.out.println("Enter the number of seats you want to book:");
+            
             seats=sc.nextInt();
-            if(seats<=0)
-            {
-                System.out.println("seats can't be negative or zero");
-            return;
-            }
+
+            
 
         }catch(Exception e)
         {
             System.out.println("invalid entry please enter the valid digit");
+        }
+        if(seats<=0)
+            {
+                System.out.println("seats can't be negative or zero");
+            return;
+            }
+            
+            for(int i=0;i<seats;i++)
+            {
+                System.out.println("Enter the seat number:");
+                try 
+                {
+                seatno=sc.nextInt();
+              
+            }catch(Exception e)
+            {
+                System.out.println("Please enter the valid seat number (eg:1,2)");
+                return;
+            }
+              if(seatno<=0)
+                {
+                    System.out.println("Seat number can't be negative or zero");
+                return;
+                }
+                try 
+                {
+                String query="insert into bookSeats (seat_no) values(?)";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setInt(1, seatno);
+            int rows=ps.executeUpdate();
+            if(rows>0)
+                {
+                    System.out.println("seat selected successfully");
+                }else 
+                    {
+                        System.out.println("unable to book");
+                    }    
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            
         }
      }
      public void menu()
