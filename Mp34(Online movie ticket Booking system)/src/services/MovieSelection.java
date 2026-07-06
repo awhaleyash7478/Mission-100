@@ -12,7 +12,7 @@ ShowSelection s;
 
    public  MovieSelection(Scanner sc,Connection conn,ShowSelection s)//TheatreSelection t)
 {
-   // this.t=t;
+
     this.sc=sc;
     this.conn=conn;
     this.s=s;
@@ -33,7 +33,7 @@ try
    System.out.printf("%-8s %-30s %-15s %-20s %-10s %-8s %-12s %-10s%n",
         "ID", "Movie Name", "Language", "Genre",
         "Duration", "Rating", "Certificate", "Status");
-    System.out.printf("---------------------------------------------------------------------------------------------------------------------------\n");
+    System.out.printf("----------------------------------------------------------------------------------------------------------------------\n");
 
     int found=0;
 while (rs.next()) {
@@ -75,6 +75,7 @@ public void movieSelection()
     }catch(Exception e)
     {
         System.out.println("pls enters the digit only");
+        sc.nextLine();
             return;
     }
     try
