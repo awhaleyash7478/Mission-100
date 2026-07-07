@@ -13,7 +13,11 @@ import javax.naming.spi.DirStateFactory.Result;
 
 public class ShowSelection {
    int seatno;
+   ArrayList<Integer>seatValidate=new ArrayList<>();
+   ArrayList<Integer> storedSeats=new ArrayList<>();
+   
    int removed=0;
+  int remainingSeats;
     Scanner sc;
     int tempRemoved;
     Connection conn;
@@ -116,7 +120,7 @@ System.out.println("------------------------------------------------------------
      public void seatLayout()
      {
         int value=1;
-       // int seat=2;
+       
 
         System.out.println();
         
@@ -133,7 +137,7 @@ System.out.println("------------------------------------------------------------
       
       int book=3;
      
-        ArrayList<Integer> storedSeats=new ArrayList<>();
+        
  char alphabet='A';
 
 
@@ -144,11 +148,13 @@ System.out.println("------------------------------------------------------------
               
                 while (rs.next()) {
                     storedSeats.add(rs.getInt("seat_no"));
+
+                    
                     
                 }
                 
                  Collections.sort(storedSeats);
-
+                seatValidate.addAll(storedSeats);
  
 
         }catch(Exception e)
@@ -218,10 +224,7 @@ System.out.println("------------------------------------------------------------
             {
                
                 System.out.print("  "+"[X]"+" ");
-            }else if(book==value)
-                {
-                    System.out.print(" "+"[V]"+" ");
-                }else 
+            }else 
             {
                 System.out.print("  "+"["+value+"]"+" ");
             }
@@ -235,9 +238,9 @@ System.out.println("------------------------------------------------------------
         
       }
             System.out.print("\t=======================================================================\n");
-            System.out.println("\t[X] Booked");
-            System.out.println("\t[V] Your selection");
-            System.out.println("\t[ ] Avaiilable");  
+            System.out.println("\t[X] Booked\t\t\t\t\tVIP(1-20)->400 rs");
+            System.out.println("\t\t\t\t\t\t\tPREMIUM(20-30)->300 rs");
+            System.out.println("\t[ ] Avaiilable\t\t\t\t\tSTANDARD(30-50)->200 rs");  
             System.out.println("\t=======================================================================\n");
 
           bookSeats();  
@@ -259,11 +262,58 @@ System.out.println("------------------------------------------------------------
         {
             System.out.println("invalid entry please enter the valid digit");
         }
+    
+          int storeRemainingSeats=0;
+         try 
+         {
+            String query="select remainingSeats from remainingSeatsValue";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ResultSet rs=ps.executeQuery();
+            if(rs.next())
+            {
+            remainingSeats=rs.getInt("remainingSeats");
+            storeRemainingSeats=remainingSeats;
+            System.out.println("validate seat:"+remainingSeats);
+            remainingSeats-=seats;
+            }else 
+            {
+                System.out.println("no seats");
+            }
+         }catch(Exception e)
+         {
+            e.printStackTrace();
+         }
         if(seats<=0)
             {
                 System.out.println("seats can't be negative or zero");
             return;
+            }else if(seats>remainingSeats)
+            {
+                System.out.println("Remainig seats: "+storeRemainingSeats);
+                return;
+
             }
+           
+try 
+{
+    String query="update  remainingSeatsValue SET remainingSeats=?";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setInt(1, remainingSeats);
+   int rows= ps.executeUpdate();
+    if(rows>0)
+    {
+        System.out.println("remaing seats value inserted in the table");
+    }else
+    {
+        System.out.println("unable to insert remaining seats value");
+    }
+
+}catch(SQLException e)
+{
+    e.printStackTrace();
+}
+
+
             
             for(int i=0;i<seats;i++)
             {
@@ -275,18 +325,30 @@ System.out.println("------------------------------------------------------------
             }catch(Exception e)
             {
                 System.out.println("Please enter the valid seat number (eg:1,2)");
+                sc.nextLine();
                 return;
             }
+          
+            
+            
+
+          
               if(seatno<=0)
                 {
                     System.out.println("Seat number can't be negative or zero");
                 return;
+                }else if(seatValidate.contains(seatno))
+                {
+                    
+                    System.out.println("This seat is already booked,pls book another seat");
+                    return;
                 }
                 try 
                 {
                 String query="insert into bookSeats (seat_no) values(?)";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setInt(1, seatno);
+            
             int rows=ps.executeUpdate();
             if(rows>0)
                 {
@@ -313,6 +375,7 @@ System.out.println("------------------------------------------------------------
         }catch(Exception e)
         {
             System.out.println("Invalid entry pls enter the digits only");
+         sc.nextLine();
             return;
         }
         if(ch==1)
