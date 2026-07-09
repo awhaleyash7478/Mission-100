@@ -79,13 +79,10 @@ System.out.println("------------------------------------------------------------
            ps2.setInt(1, showID);
            ps2.setInt(2, obj.movieID);
            int rows=ps2.executeUpdate();
-           if(rows>0)
-           {
-            System.out.println("inserted show id:"+showID);
-           }else {
-            System.out.println("unable to insert");
-           }
-            
+          if(rows<=0)
+          {
+            System.out.println("cannot update booking details in show selection class");
+          }
         }catch(Exception e)
         {
             System.out.println("invalid id pls enters the digits only");
@@ -318,7 +315,7 @@ try
    int rows= ps.executeUpdate();
     if(rows<=0)
     {
-        System.out.println("remaing seats value inserted in the table");
+        System.out.println("unable to insert the seat number in the table");
     }
 
 }catch(SQLException e)
@@ -326,7 +323,7 @@ try
     e.printStackTrace();
 }
 
-// cusidGeneration();
+
 
             
             for(int i=0;i<seats;i++)
@@ -360,7 +357,7 @@ try
                 
                 try 
                 {
-                    // MovieSelection mobj=new MovieSelection(sc, conn,this);
+                   
                 String query="insert into bookSeats (cus_id,seat_no) values(?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setInt(1, obj.generated_cus_id);
@@ -368,13 +365,14 @@ try
             
             int rows=ps.executeUpdate();
             
-            if(rows>0)
+            if(rows>=0)
                 {
-                    System.out.println("no tension its ok because id:"+obj.generated_cus_id);
+                     
+                   
                     status="Locked";
                 }else 
-                    {    
-                    System.out.println("unable to select the seat");
+                    {    System.out.println("unable to select the seat");
+                   
                     }
                    
             }
@@ -390,12 +388,7 @@ try
                     billObj.calculateBill();
         
      }
-    //  public void cusidGeneration()
-    //  {
-    //     Random r=new Random();
-    // generated_cus_id=    r.nextInt(1000, 10000);
     
-    //  }
      public void menu()
      {
         int ch=0;

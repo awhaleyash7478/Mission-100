@@ -109,16 +109,12 @@ public void movieSelection()
          
            ps2.setInt(1, generated_cus_id);
              ps2.setInt(2, movieID);
-           int rows=ps2.executeUpdate();
-           if(rows>0)
-           {
-            System.out.println("movie id inserted in table:"+movieID);
-           }else 
-           {
-            System.out.println("unable to insert the movieid");
-           }
+         int rows=  ps2.executeUpdate();
+         if(rows>0)
+         {
     
       t.viewTheatre();
+         }
         }else 
         {
             System.out.println("No such movie available");
@@ -134,6 +130,7 @@ public void movieSelection()
         Random r=new Random();
     generated_cus_id=    r.nextInt(1000, 10000);
     BillCalculation billObj=new BillCalculation(s, conn, sc, this);
+    TicketGeneration ticObj=new TicketGeneration(conn,this);
      }
     public void menu()
     {

@@ -34,7 +34,7 @@ public class BillCalculation {
 
     public void calculateBill()
     {
-// MovieSelection movObj=new MovieSelection(sc, conn, showObj);
+
        
         try 
 
@@ -47,20 +47,17 @@ public class BillCalculation {
             {
                 storedseatNo.add(rs.getInt("seat_no"));
             }
-            System.out.println("before sorting:"+storedseatNo);
+           
             storedseatNo.sort(null);
             String seatnum=storedseatNo.toString();
             String storeseat="update bookingdetails set seat_no=? where cus_id=?";
             PreparedStatement pp=conn.prepareStatement(storeseat);
             pp.setString(1,seatnum);
             pp.setInt(2, movObj.generated_cus_id);
-            int rr=pp.executeUpdate();
-            if(rr>0)
+            int rows=pp.executeUpdate();
+            if(rows<=0)
             {
-                System.out.println("yes we have doneit: "+seatnum);
-            }else 
-            {
-                System.out.println("haar nhi manege");
+                System.out.println("unable to update booking details in BillCalculation");
             }
           
 
@@ -69,16 +66,15 @@ public class BillCalculation {
             e.printStackTrace();
 
         }
-        System.out.println("stored seat number:"+storedseatNo);
+       
         for(int i=0;i<storedseatNo.size();i++){
-            System.out.println("stored seat nos:"+storedseatNo);
+            
             if(storedseatNo.get(i)<=20)
             {
                 Vip.add(storedseatNo.get(i));
                 vipLength=Vip.size();
                 billVipSection=vipLength*400;
-                System.out.println("bill vip:"+billVipSection);
-                System.out.println("vip seats:"+Vip);
+               
                 
             }else if(storedseatNo.get(i)<=40)
             {
@@ -99,30 +95,31 @@ public class BillCalculation {
         
         gst=totalBill*0.10;
         finalTicketPrice=totalBill+gst;
-        System.out.println("total bill:"+finalTicketPrice+"seats:"+totalSeats);
-        payment();
-
-try 
+        System.out.println("\t\t------------------------------------");
+        System.out.println("\t\ttotal bill:"+finalTicketPrice+" for no.of seats: "+totalSeats);
+        System.out.println("\t\t------------------------------------");
+        try 
 {
-    String query="update bookingdetails set amount=? ,status=? where cus_id=?";
+
+    String query="update bookingdetails set amount=?  where cus_id=?";
     PreparedStatement ps=conn.prepareStatement(query);
     ps.setDouble(1, finalTicketPrice);
-    ps.setString(2, showObj.status);
-    ps.setInt(3,movObj.generated_cus_id );
-    int u=ps.executeUpdate();
-    if(u>0)
-    {
-        System.out.println("yash finally finally done");
 
-    }else 
+    ps.setInt(2,movObj.generated_cus_id );
+    int rows=ps.executeUpdate();
+    if(rows<=0)
     {
-        System.out.println("wait a little");
+        System.out.println("unable to update the table booking details in bill calculation");
+
     }
-
 }catch(Exception e)
 {
     e.printStackTrace();
 }
+
+        payment();
+
+
     }
     
     public void payment()
@@ -153,7 +150,20 @@ try
         {
             e.printStackTrace();
         }
-        showObj.status="Booked";
+        try 
+        {
+        String query = "update bookingdetails set status='booked' where cus_id=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setInt(1, movObj.generated_cus_id);
+            ps.executeUpdate();
+
+        }catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        
+        TicketGeneration ticObj=new TicketGeneration(conn,movObj);
+        ticObj.generateTicket();
 
        }
         

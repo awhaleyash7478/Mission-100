@@ -80,14 +80,11 @@ while (rs.next()) {
   PreparedStatement ps=conn.prepareStatement(update);
   ps.setInt(1, theatreID);
   ps.setInt(2, m.generated_cus_id);
-  System.out.println("generated id:"+m.generated_cus_id);
+ 
   int rows=ps.executeUpdate();
-  if(rows>0)
+  if(rows<0)
   {
-    System.out.println("done wow");
-  }else 
-  {
-    System.out.println("not done");
+    System.out.println("cannot update table booking details in theatre selection class");
   }
   } catch (Exception e) {
     e.printStackTrace();
