@@ -4,22 +4,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.Scanner;
 public class MovieSelection {
 Scanner sc;
 Connection conn;
-ShowSelection s;
+ ShowSelection s;
+
 
    public  MovieSelection(Scanner sc,Connection conn,ShowSelection s)//TheatreSelection t)
 {
 
     this.sc=sc;
     this.conn=conn;
-    this.s=s;
+     this.s=s;
+     
 }
 
 
 public int movieID;
+int generated_cus_id;
 
  
 public void viewMovies()
@@ -71,13 +75,16 @@ public void movieSelection()
     {
         System.out.println("Enter the movie id:");
         movieID=sc.nextInt();
-        sc.nextLine();
+          cusidGeneration();
+        
     }catch(Exception e)
     {
         System.out.println("pls enters the digit only");
         sc.nextLine();
             return;
     }
+
+ 
     try
     {
         String query="select * from movies where movie_id=? and status='Running'";
@@ -96,6 +103,20 @@ public void movieSelection()
             System.out.println("Selected movie: "+movieName+"\nLanguage: "+language+"\nDuration: "+duration);
 
            TheatreSelection t=new TheatreSelection(conn, sc,this,s);
+           String movieinserion="insert into bookingdetails(cus_id,movie_id)values(?,?)";
+
+           PreparedStatement ps2=conn.prepareStatement(movieinserion);
+         
+           ps2.setInt(1, generated_cus_id);
+             ps2.setInt(2, movieID);
+           int rows=ps2.executeUpdate();
+           if(rows>0)
+           {
+            System.out.println("movie id inserted in table:"+movieID);
+           }else 
+           {
+            System.out.println("unable to insert the movieid");
+           }
     
       t.viewTheatre();
         }else 
@@ -108,6 +129,12 @@ public void movieSelection()
         e.printStackTrace();
     }
 }
+ public void cusidGeneration()
+     {
+        Random r=new Random();
+    generated_cus_id=    r.nextInt(1000, 10000);
+    BillCalculation billObj=new BillCalculation(s, conn, sc, this);
+     }
     public void menu()
     {
         int ch=0;

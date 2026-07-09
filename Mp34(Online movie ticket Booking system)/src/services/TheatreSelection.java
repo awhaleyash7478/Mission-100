@@ -17,6 +17,7 @@ public class TheatreSelection {
         this.conn=conn;
         this.sc=sc;
         this.m=m;
+        this.obj=obj;
        
     }
      int theatreID=0;
@@ -73,6 +74,23 @@ while (rs.next()) {
   {
     System.out.println("Pls enter the diigits only");
     return;
+  }
+  try {
+  String update="update bookingdetails set theatre_id=? where cus_id=?";
+  PreparedStatement ps=conn.prepareStatement(update);
+  ps.setInt(1, theatreID);
+  ps.setInt(2, m.generated_cus_id);
+  System.out.println("generated id:"+m.generated_cus_id);
+  int rows=ps.executeUpdate();
+  if(rows>0)
+  {
+    System.out.println("done wow");
+  }else 
+  {
+    System.out.println("not done");
+  }
+  } catch (Exception e) {
+    e.printStackTrace();
   }
   try 
   {

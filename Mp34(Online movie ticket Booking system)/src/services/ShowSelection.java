@@ -19,7 +19,7 @@ public class ShowSelection {
    
    int removed=0;
   int remainingSeats;
-  int generated_cus_id;
+//   int generated_cus_id;
   String status;
     Scanner sc;
     int tempRemoved;
@@ -74,6 +74,18 @@ System.out.println("------------------------------------------------------------
         {
             System.out.println("Enter the show id:");
             showID=sc.nextInt();
+             String showInsertion="update bookingdetails set show_id=? where movie_id=?";
+           PreparedStatement ps2=conn.prepareStatement(showInsertion);
+           ps2.setInt(1, showID);
+           ps2.setInt(2, obj.movieID);
+           int rows=ps2.executeUpdate();
+           if(rows>0)
+           {
+            System.out.println("inserted show id:"+showID);
+           }else {
+            System.out.println("unable to insert");
+           }
+            
         }catch(Exception e)
         {
             System.out.println("invalid id pls enters the digits only");
@@ -97,6 +109,7 @@ System.out.println("------------------------------------------------------------
             System.out.println("Show does not exist");
             return;
            }
+          
            LocalDate currentDate = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
 
@@ -313,7 +326,7 @@ try
     e.printStackTrace();
 }
 
-cusidGeneration();
+// cusidGeneration();
 
             
             for(int i=0;i<seats;i++)
@@ -347,19 +360,23 @@ cusidGeneration();
                 
                 try 
                 {
+                    // MovieSelection mobj=new MovieSelection(sc, conn,this);
                 String query="insert into bookSeats (cus_id,seat_no) values(?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setInt(1, generated_cus_id);
+            ps.setInt(1, obj.generated_cus_id);
             ps.setInt(2, seatno);
             
             int rows=ps.executeUpdate();
             
-            if(rows<0)
+            if(rows>0)
                 {
+                    System.out.println("no tension its ok because id:"+obj.generated_cus_id);
                     status="Locked";
-                    
+                }else 
+                    {    
                     System.out.println("unable to select the seat");
-                }   
+                    }
+                   
             }
             catch(Exception e)
             {
@@ -369,16 +386,16 @@ cusidGeneration();
             
             
         }
-         BillCalculation billObj=new BillCalculation(this, conn,sc);
+         BillCalculation billObj=new BillCalculation(this, conn,sc,obj);
                     billObj.calculateBill();
         
      }
-     public void cusidGeneration()
-     {
-        Random r=new Random();
-    generated_cus_id=    r.nextInt(1000, 10000);
+    //  public void cusidGeneration()
+    //  {
+    //     Random r=new Random();
+    // generated_cus_id=    r.nextInt(1000, 10000);
     
-     }
+    //  }
      public void menu()
      {
         int ch=0;

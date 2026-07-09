@@ -13,12 +13,13 @@ public class BillCalculation {
     ShowSelection showObj;
     Connection conn;
     Scanner sc;
-    public BillCalculation(ShowSelection showObj,Connection conn,Scanner sc)
+    MovieSelection movObj;
+    public BillCalculation(ShowSelection showObj,Connection conn,Scanner sc,MovieSelection movObj)
     {
         this.showObj=showObj;
         this.conn=conn;
         this.sc=sc;
-
+       this.movObj=movObj;
     }
     ArrayList<Integer> Vip=new ArrayList<>();
     ArrayList<Integer>Premium=new ArrayList<>();
@@ -33,14 +34,14 @@ public class BillCalculation {
 
     public void calculateBill()
     {
-
+// MovieSelection movObj=new MovieSelection(sc, conn, showObj);
        
         try 
 
         {
             String query="select seat_no from bookSeats where cus_id=?";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setInt(1, showObj.generated_cus_id);
+            ps.setInt(1, movObj.generated_cus_id);
             ResultSet rs=ps.executeQuery();
             while(rs.next())
             {
@@ -48,6 +49,20 @@ public class BillCalculation {
             }
             System.out.println("before sorting:"+storedseatNo);
             storedseatNo.sort(null);
+            String seatnum=storedseatNo.toString();
+            String storeseat="update bookingdetails set seat_no=? where cus_id=?";
+            PreparedStatement pp=conn.prepareStatement(storeseat);
+            pp.setString(1,seatnum);
+            pp.setInt(2, movObj.generated_cus_id);
+            int rr=pp.executeUpdate();
+            if(rr>0)
+            {
+                System.out.println("yes we have doneit: "+seatnum);
+            }else 
+            {
+                System.out.println("haar nhi manege");
+            }
+          
 
         }catch(SQLException e)
         {
@@ -80,13 +95,36 @@ public class BillCalculation {
         }
         totalBill=billVipSection+billPremiumSection+billStandardSection;
         totalSeats=vipLength+preLength+stdLength;
+        
+        
         gst=totalBill*0.10;
         finalTicketPrice=totalBill+gst;
         System.out.println("total bill:"+finalTicketPrice+"seats:"+totalSeats);
         payment();
 
+try 
+{
+    String query="update bookingdetails set amount=? ,status=? where cus_id=?";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setDouble(1, finalTicketPrice);
+    ps.setString(2, showObj.status);
+    ps.setInt(3,movObj.generated_cus_id );
+    int u=ps.executeUpdate();
+    if(u>0)
+    {
+        System.out.println("yash finally finally done");
 
+    }else 
+    {
+        System.out.println("wait a little");
     }
+
+}catch(Exception e)
+{
+    e.printStackTrace();
+}
+    }
+    
     public void payment()
     {
         Double amount=0.0;
@@ -116,7 +154,6 @@ public class BillCalculation {
             e.printStackTrace();
         }
         showObj.status="Booked";
-
 
        }
         
