@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 import java.util.Scanner;
 import javax.naming.spi.DirStateFactory.Result;
 
@@ -18,6 +19,8 @@ public class ShowSelection {
    
    int removed=0;
   int remainingSeats;
+  int generated_cus_id;
+  String status;
     Scanner sc;
     int tempRemoved;
     Connection conn;
@@ -273,7 +276,7 @@ System.out.println("------------------------------------------------------------
             {
             remainingSeats=rs.getInt("remainingSeats");
             storeRemainingSeats=remainingSeats;
-            System.out.println("validate seat:"+remainingSeats);
+           
             remainingSeats-=seats;
             }else 
             {
@@ -300,12 +303,9 @@ try
     PreparedStatement ps=conn.prepareStatement(query);
     ps.setInt(1, remainingSeats);
    int rows= ps.executeUpdate();
-    if(rows>0)
+    if(rows<=0)
     {
         System.out.println("remaing seats value inserted in the table");
-    }else
-    {
-        System.out.println("unable to insert remaining seats value");
     }
 
 }catch(SQLException e)
@@ -313,6 +313,7 @@ try
     e.printStackTrace();
 }
 
+cusidGeneration();
 
             
             for(int i=0;i<seats;i++)
@@ -343,27 +344,40 @@ try
                     System.out.println("This seat is already booked,pls book another seat");
                     return;
                 }
+                
                 try 
                 {
-                String query="insert into bookSeats (seat_no) values(?)";
+                String query="insert into bookSeats (cus_id,seat_no) values(?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setInt(1, seatno);
+            ps.setInt(1, generated_cus_id);
+            ps.setInt(2, seatno);
             
             int rows=ps.executeUpdate();
-            if(rows>0)
+            
+            if(rows<0)
                 {
-                    System.out.println("seat selected successfully");
-                }else 
-                    {
-                        System.out.println("unable to book");
-                    }    
+                    status="Locked";
+                    
+                    System.out.println("unable to select the seat");
+                }   
             }
             catch(Exception e)
             {
                 e.printStackTrace();
             }
+           
+            
             
         }
+         BillCalculation billObj=new BillCalculation(this, conn,sc);
+                    billObj.calculateBill();
+        
+     }
+     public void cusidGeneration()
+     {
+        Random r=new Random();
+    generated_cus_id=    r.nextInt(1000, 10000);
+    
      }
      public void menu()
      {

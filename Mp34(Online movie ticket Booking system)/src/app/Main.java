@@ -26,6 +26,7 @@ public class Main {
             System.out.println("connection established successfully");
               MovieSelection m=new MovieSelection(sc,conn,obj);
             CustomerVerification l=new CustomerVerification(sc,conn,m);
+           
           
 
             l.menu();
