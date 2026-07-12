@@ -21,9 +21,14 @@ public class Main {
                     
             System.out.println("connection established successfully");
             
-                
-              CustomerVerification cusObj=new CustomerVerification(sc, conn);
+                  ParcelBooking parObj=new ParcelBooking(conn,sc);
+              CustomerVerification cusObj=new CustomerVerification(sc, conn,parObj);
+            
+           
               cusObj.menu();
+
+
+             
     }catch(SQLException e)
     {
         e.printStackTrace();

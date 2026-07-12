@@ -11,19 +11,21 @@ import threads.*;
 public class CustomerVerification {
     Scanner sc;
     Connection conn;
-    
+    ParcelBooking parObj;
     public int otpgenerated;
-   public CustomerVerification(Scanner sc,Connection conn)
-    {
-        
-        this.sc=sc;
-        this.conn=conn;
+   public CustomerVerification(Scanner sc,Connection conn,ParcelBooking parObj)
+       {
+           
+           this.sc=sc;
+           this.conn=conn;
+           this.parObj=parObj;
     }
     
         String  mobNo=null;
         String password=null;
         String userName=null;
-    public void login()
+        String address=null;
+    public void  login()
     {
         try 
         {
@@ -59,7 +61,9 @@ public class CustomerVerification {
             if(rows>0)
                 {
                     System.out.println("Login Successfull");
-                
+                    parObj.senderDetails();
+                    
+                return;
                     
 
 
@@ -82,7 +86,7 @@ public class CustomerVerification {
             e.printStackTrace();
         }
     }
-   public void register()
+   public  void register()
     {
         
           try 
@@ -102,7 +106,7 @@ public class CustomerVerification {
             }catch(Exception e)
             {
                 System.out.println("Invalid choice");
-                return;
+                return ;
             }
             
             if(choice==2)
@@ -114,12 +118,23 @@ public class CustomerVerification {
 
            System.out.println("Enter the mobile number:");
             mobNo = sc.next();
+            sc.nextLine();
 
 if (!mobNo.matches("[7-9][0-9]{9}")) {
     
     System.out.println("Invalid mobile number");
-    return;
+    return ;
 }
+System.out.println("Enter the address:");
+
+    address=sc.nextLine().trim();
+   String regex = "^[A-Za-z0-9\\s,./#()'-]{5,100}$";
+    if( !address.matches(regex))
+    {
+        System.out.println("Invalid address pls enter the valid address");
+        return;
+    }
+
  try {
              String search="select * from register where user_name=? and password=?";
             PreparedStatement pp=conn.prepareStatement(search);
@@ -151,6 +166,7 @@ if (!mobNo.matches("[7-9][0-9]{9}")) {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
              
           Random random = new Random();
 otpgenerated = 1000 + random.nextInt(9000);
@@ -171,6 +187,7 @@ if(OTP==otpgenerated)
 {
     flag=1;
     System.out.println("Account registered successfully 😊");
+    return;
 
 }else if(flag==0) 
 {
@@ -189,7 +206,7 @@ if(OTP==otpgenerated)
         }
        
     }
-    public void menu()
+    public void  menu()
     {
         int ch=0;
         while (true) {
@@ -209,14 +226,14 @@ if(OTP==otpgenerated)
         }
         switch (ch) {
             case 1:
-                login();
+              login();
+             break;   
                 
-                break;
             case 2:
-                register();
-                break;
+               register();
+               break; 
             case 3:
-               return; 
+               return ; 
             default:
                 System.out.println("Invalid entry");
                 break;
