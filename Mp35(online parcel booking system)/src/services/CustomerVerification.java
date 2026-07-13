@@ -166,7 +166,21 @@ System.out.println("Enter the address:");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+       
+            
+        }
+        catch(Exception e)
+        {
+            System.out.println("Invalid input pls enter the valid input only");
+            sc.nextLine();
+            menu();
+
+        }
+       
+    }
+     public void generateOtp()
+        {
+         
              
           Random random = new Random();
 otpgenerated = 1000 + random.nextInt(9000);
@@ -186,7 +200,8 @@ int flag=0;
 if(OTP==otpgenerated)
 {
     flag=1;
-    System.out.println("Account registered successfully 😊");
+    System.out.println("Valid otp");
+   
     return;
 
 }else if(flag==0) 
@@ -195,17 +210,7 @@ if(OTP==otpgenerated)
     return;
 
 }
-            
         }
-        catch(Exception e)
-        {
-            System.out.println("Invalid input pls enter the valid input only");
-            sc.nextLine();
-            menu();
-
-        }
-       
-    }
     public void  menu()
     {
         int ch=0;

@@ -3,21 +3,29 @@ package services;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class ParcelBooking {
     Connection conn;
     Scanner sc;
-    public ParcelBooking(Connection conn,Scanner sc)
+    ParcelDetails parObj2;
+    
+    public ParcelBooking(Connection conn,Scanner sc,ParcelDetails parObj2)
     {
         this.conn=conn;
         this.sc=sc;
+        this.parObj2=parObj2;
+   
     }
+    int distance;
+    String sender_add=null;
+    
 
 public void senderDetails()
 {
     String senderName=null;
-    String sender_add=null;
+    
     System.out.println("Enter the sender's name:");
     try
     {
@@ -88,6 +96,10 @@ public void receiverDetails()
     {
         System.out.println("Invalid address pls enter the valid address");
         return;
+    }else if(sender_add.equals(receiver_add))
+    {
+        System.out.println("Sender and receivers address can't be same");
+        return;
     }
     try 
     {
@@ -101,6 +113,7 @@ public void receiverDetails()
             System.out.println("\t\t-------------------------------");
             System.out.println("\t\treceiver details added succesfully");
              System.out.println("\t\t-------------------------------");
+              parObj2.getParcelDetails();
         }else 
         {
              System.out.println("\t\t-------------------------------");
@@ -111,7 +124,18 @@ public void receiverDetails()
     {
         e.printStackTrace();
     }
+    calculateDistance();
+    
 
+    
+}
+public void calculateDistance()
+{
+    Random random=new Random();
+    distance=random.nextInt(1, 100);
+    System.out.println("total distance: "+distance);
+    PaymentManagement payObj=new PaymentManagement(parObj2, this, conn, sc);
+    payObj.calculatePrice();
     
 }
 
