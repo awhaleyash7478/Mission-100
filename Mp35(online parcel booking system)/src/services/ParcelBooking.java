@@ -2,29 +2,35 @@ package services;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.Scanner;
+
+import javax.naming.spi.DirStateFactory.Result;
 
 public class ParcelBooking {
     Connection conn;
     Scanner sc;
     ParcelDetails parObj2;
-    
+   
     public ParcelBooking(Connection conn,Scanner sc,ParcelDetails parObj2)
     {
         this.conn=conn;
         this.sc=sc;
         this.parObj2=parObj2;
+    
    
     }
     int distance;
     String sender_add=null;
-    
+    String receiverName=null;
+    String receiver_add=null;
+     String senderName=null;
 
 public void senderDetails()
 {
-    String senderName=null;
+   
     
     System.out.println("Enter the sender's name:");
     try
@@ -59,6 +65,16 @@ public void senderDetails()
             System.out.println("\t\t-------------------------------");
             System.out.println("\t\tSender details added succesfully");
              System.out.println("\t\t-------------------------------");
+              String fetchId="SELECT * FROM sender ORDER BY sender_id DESC LIMIT 1;";
+        PreparedStatement ps1=conn.prepareStatement(fetchId);
+        ResultSet rs1=ps1.executeQuery();
+        if(rs1.next())
+        {
+        int fetchedId=rs1.getInt("sender_id");
+        
+        System.out.println("sender id should be 24 and it is:"+fetchedId);
+        }
+
              receiverDetails();
         }else 
         {
@@ -66,17 +82,18 @@ public void senderDetails()
              System.out.println("\t\tUnable to add sender");
               System.out.println("\t\t-------------------------------");
         }
+       
     }catch(SQLException e)
     {
         e.printStackTrace();
     }
 
 
+
 }
 public void receiverDetails()
 {
-    String receiverName=null;
-    String receiver_add=null;
+    
      System.out.println("Enter the Reciever's name:");
     try
     {
@@ -113,6 +130,7 @@ public void receiverDetails()
             System.out.println("\t\t-------------------------------");
             System.out.println("\t\treceiver details added succesfully");
              System.out.println("\t\t-------------------------------");
+       
               parObj2.getParcelDetails();
         }else 
         {
@@ -134,7 +152,8 @@ public void calculateDistance()
     Random random=new Random();
     distance=random.nextInt(1, 100);
     System.out.println("total distance: "+distance);
-    PaymentManagement payObj=new PaymentManagement(parObj2, this, conn, sc);
+    CustomerVerification cusObj=new CustomerVerification(sc, conn, this);
+    PaymentManagement payObj=new PaymentManagement(parObj2, this, conn, sc,cusObj);
     payObj.calculatePrice();
     
 }

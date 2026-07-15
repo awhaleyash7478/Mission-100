@@ -1,23 +1,28 @@
 package services;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import threads.*;
 
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.xml.transform.Result;
+
 public class PaymentManagement {
     ParcelDetails parObj;
     ParcelBooking parObj2;
     Connection conn;
+    CustomerVerification cusObj;
     Scanner sc;
-    public PaymentManagement(ParcelDetails parobj,ParcelBooking parObj2,Connection conn,Scanner sc)
+    public PaymentManagement(ParcelDetails parobj,ParcelBooking parObj2,Connection conn,Scanner sc,CustomerVerification cusObj)
     {
         this.parObj=parobj;
         this.parObj2=parObj2;
          this.conn=conn;
          this.sc=sc;
+         this.cusObj=cusObj;
     }
      final double baseCharge=50;
     double weightCharge,distanceCharge;
@@ -42,7 +47,9 @@ payment();
 
 
 
-    }CustomerVerification cusObj=new CustomerVerification(sc, conn, parObj2);
+    }
+    
+    // CustomerVerification cusObj=new CustomerVerification(sc, conn, parObj2);
     public void payment()
     {
        double amount=0.0;
@@ -64,6 +71,77 @@ payment();
         try 
         {
             p.join();
+            int fetchedId=0;
+            int fetchedId2=0;
+                  String fetchId="SELECT * FROM sender ORDER BY sender_id DESC LIMIT 1;";
+              PreparedStatement ps1=conn.prepareStatement(fetchId);
+        ResultSet rs1=ps1.executeQuery();
+        if(rs1.next())
+        {
+         fetchedId=rs1.getInt("sender_id");
+        
+       
+        }
+              String fetchId2="SELECT * FROM receiver ORDER BY receiver_id DESC LIMIT 1;";
+              PreparedStatement ps2=conn.prepareStatement(fetchId2);
+        ResultSet rs2=ps2.executeQuery();
+        if(rs2.next())
+        {
+         fetchedId2=rs2.getInt("receiver_id");
+        
+      
+        }
+        
+            String query="insert into parcelDetails(weight,charges,sender_id,receiver_id)values(?,?,?,?)";
+            
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setDouble(1,parObj.weight);
+            ps.setDouble(2, finalAmount);
+            ps.setInt(3, fetchedId);
+            ps.setInt(4, fetchedId2);
+           int rows=ps.executeUpdate();
+           if(rows<=0)
+           {
+            System.out.println("Unable to insert parcel details in parcel details table");
+        return;   
+        }
+        String parcelid="select parcel_id from parcelDetails order by parcel_id desc limit 1";
+        PreparedStatement ppp=conn.prepareStatement(parcelid);
+        ResultSet rsss=ppp.executeQuery();
+        int tempParcelID=0;
+        if(rsss.next())
+        {
+tempParcelID=rsss.getInt("parcel_id");
+System.out.println("parcel id from parcel details: "+tempParcelID);
+        }
+                String fetchUserName="select * from login order by login_id desc limit 1";
+            PreparedStatement preparedStatement=conn.prepareStatement(fetchUserName);
+            String username=null;
+            ResultSet rr=preparedStatement.executeQuery();
+            if(rr.next())
+            {
+username=rr.getString("user_name");
+                System.out.println("username from login: "+username);
+            }
+        String query2="insert into parcel_history(parcel_id,sender_name,receiver_name,sender_add,receiver_add,status,user_name)values(?,?,?,?,?,?,?)";
+        PreparedStatement pss=conn.prepareStatement(query2);
+        pss.setInt(1,tempParcelID);
+        pss.setString(2, parObj2.senderName);
+        pss.setString(3, parObj2.receiverName);
+        pss.setString(4, parObj2.sender_add);
+        pss.setString(5, parObj2.receiver_add);
+        String tempStatus="Booked";
+        pss.setString(6,tempStatus);
+        pss.setString(7,username);
+        int rowss=pss.executeUpdate();
+        if(rowss<=0)
+        {
+            System.out.println("unable to insert into the table parcel history");
+        return;
+        }
+
+        
+
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -80,7 +158,7 @@ payment();
 
 
     
-        DeliveryThread dd=new DeliveryThread(cusObj);
+        DeliveryThread dd=new DeliveryThread(cusObj,conn);
        Random random = new Random();
  int otpgenerated = 1000 + random.nextInt(9000);
 
@@ -105,6 +183,7 @@ if(OTP==otpgenerated)
     System.out.println("Valid otp");
    
      dd.start();
+     System.out.println("Entered back into the payment management");
 
 }else if(flag==0) 
 {

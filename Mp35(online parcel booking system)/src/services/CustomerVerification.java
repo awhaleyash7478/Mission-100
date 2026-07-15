@@ -23,7 +23,7 @@ public class CustomerVerification {
     
         String  mobNo=null;
         String password=null;
-        String userName=null;
+        String userName;
         String address=null;
     public void  login()
     {
@@ -160,6 +160,7 @@ System.out.println("Enter the address:");
                     return;
 
                 } 
+                generateOtp();
             
            }
             
@@ -200,7 +201,7 @@ int flag=0;
 if(OTP==otpgenerated)
 {
     flag=1;
-    System.out.println("Valid otp");
+    System.out.println("Account registered Successfully");
    
     return;
 

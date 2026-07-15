@@ -23,13 +23,16 @@ public class Main {
                     
             System.out.println("connection established successfully");
              ParcelDetails parObj2=new ParcelDetails(sc,conn);
-              ParcelBooking parObj=new ParcelBooking(conn,sc,parObj2);
+             
 
-            PaymentManagement prObj=new PaymentManagement(parObj2,parObj,conn,sc);
             
-                 
+            
+                  ParcelBooking parObj=new ParcelBooking(conn,sc,parObj2);
               CustomerVerification cusObj=new CustomerVerification(sc, conn,parObj);
-       DeliveryThread d=new DeliveryThread(cusObj);
+              PaymentManagement prObj=new PaymentManagement(parObj2,parObj,conn,sc,cusObj);
+                 ParcelHistory hisObj=new ParcelHistory(conn);
+       DeliveryThread d=new DeliveryThread(cusObj,conn);
+    
              
             
            
