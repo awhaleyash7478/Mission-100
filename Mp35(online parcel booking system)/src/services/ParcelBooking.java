@@ -72,7 +72,7 @@ public void senderDetails()
         {
         int fetchedId=rs1.getInt("sender_id");
         
-        System.out.println("sender id should be 24 and it is:"+fetchedId);
+       
         }
 
              receiverDetails();

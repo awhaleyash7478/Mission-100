@@ -16,6 +16,7 @@ public class PaymentManagement {
     Connection conn;
     CustomerVerification cusObj;
     Scanner sc;
+     int tempParcelID=0;
     public PaymentManagement(ParcelDetails parobj,ParcelBooking parObj2,Connection conn,Scanner sc,CustomerVerification cusObj)
     {
         this.parObj=parobj;
@@ -24,6 +25,7 @@ public class PaymentManagement {
          this.sc=sc;
          this.cusObj=cusObj;
     }
+
      final double baseCharge=50;
     double weightCharge,distanceCharge;
     double GST;
@@ -106,9 +108,10 @@ payment();
         return;   
         }
         String parcelid="select parcel_id from parcelDetails order by parcel_id desc limit 1";
+        
         PreparedStatement ppp=conn.prepareStatement(parcelid);
         ResultSet rsss=ppp.executeQuery();
-        int tempParcelID=0;
+       
         if(rsss.next())
         {
 tempParcelID=rsss.getInt("parcel_id");
@@ -121,7 +124,7 @@ System.out.println("parcel id from parcel details: "+tempParcelID);
             if(rr.next())
             {
 username=rr.getString("user_name");
-                System.out.println("username from login: "+username);
+            
             }
         String query2="insert into parcel_history(parcel_id,sender_name,receiver_name,sender_add,receiver_add,status,user_name)values(?,?,?,?,?,?,?)";
         PreparedStatement pss=conn.prepareStatement(query2);
@@ -139,6 +142,17 @@ username=rr.getString("user_name");
             System.out.println("unable to insert into the table parcel history");
         return;
         }
+        String parcel="insert into parcel_tracking(parcel_id,status,username)values(?,?,?)";
+        PreparedStatement ps3=conn.prepareStatement(parcel);
+        ps3.setInt(1, tempParcelID);
+        ps3.setString(2, tempStatus);
+        ps3.setString(3, username);
+        int rows3=ps3.executeUpdate();
+        if(rows3<=0)
+        {
+            System.out.println("unable to insert the values in parcel_tracking table");
+            return;
+        }
 
         
 
@@ -147,7 +161,9 @@ username=rr.getString("user_name");
             e.printStackTrace();
         }
         DriverAssignmentThread d=new DriverAssignmentThread(conn);
+        d.setParcelId(tempParcelID);
         d.start();
+
         try 
         {
             d.join();
@@ -181,10 +197,9 @@ if(OTP==otpgenerated)
 {
     flag=1;
     System.out.println("Valid otp");
-   
+   dd.setParcelId(tempParcelID);
      dd.start();
-     System.out.println("Entered back into the payment management");
-
+    
 }else if(flag==0) 
 {
     System.out.println("Invalid otp");

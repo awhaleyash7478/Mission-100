@@ -32,6 +32,7 @@ public class Main {
               PaymentManagement prObj=new PaymentManagement(parObj2,parObj,conn,sc,cusObj);
                  ParcelHistory hisObj=new ParcelHistory(conn);
        DeliveryThread d=new DeliveryThread(cusObj,conn);
+       ParcelTracking tr=new ParcelTracking(conn);
     
              
             

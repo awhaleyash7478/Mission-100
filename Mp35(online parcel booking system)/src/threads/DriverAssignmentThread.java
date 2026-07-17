@@ -15,6 +15,10 @@ public class DriverAssignmentThread  extends Thread{
         this.conn=conn;
         
     }
+    int parcelId;
+     public void setParcelId(int parcelId) {
+        this.parcelId = parcelId;
+    }
     public void run()
 {
     
@@ -22,6 +26,7 @@ public class DriverAssignmentThread  extends Thread{
     
     try
     {
+        
         String tempStatus="free";
         String query="select * from drivers where status=?";
         PreparedStatement ps=conn.prepareStatement(query);
@@ -39,6 +44,17 @@ public class DriverAssignmentThread  extends Thread{
             System.out.println("unable to update status");
             return;
         }
+        String updatestatus="update  parcel_tracking set status='Out For Delivery' where parcel_id=?";
+        PreparedStatement ps2=conn.prepareStatement(updatestatus);
+        ps2.setInt(1, parcelId);
+        int rows2=ps2.executeUpdate();
+        if(rows2<=0)
+        {
+            System.out.println("unable to update the values for the parcel_tracking table");
+            return;
+        }
+
+        
         
       
         }else 

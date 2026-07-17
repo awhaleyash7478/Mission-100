@@ -60,10 +60,49 @@ public class CustomerVerification {
             int rows=ps.executeUpdate();
             if(rows>0)
                 {
-                    System.out.println("Login Successfull");
-                    parObj.senderDetails();
+                    while(true) {
+                        
                     
-                return;
+                    System.out.println("Login Successfull");
+                    System.out.println("1.View Parcel History\n2.Track Parcel\n3.Book Parcel\n4.Exit");
+                    int choice=0;
+                    try 
+                    {
+                        choice=sc.nextInt();
+                        sc.nextLine();
+                    }catch(Exception e)
+                    {
+                        System.out.println("pls enter the valid input");
+                        login();
+                    }
+                    if(choice==1)
+                    {
+                        ParcelHistory p=new ParcelHistory(conn);
+                        p.viewHistory();
+                    }else if (choice==2)
+                    {
+                        ParcelTracking p=new ParcelTracking(conn);
+                        p.trakParcel();
+
+                    }else if(choice==3)
+                    { parObj.senderDetails();
+
+                        
+                        
+                    }
+                    else if(choice==4)
+                    {
+                        return;
+                    }
+                        else 
+                    {
+                        System.out.println("invalid option selected");
+                        return;
+                    }
+                }
+                   
+                    
+                //return;
                     
 
 
@@ -89,10 +128,23 @@ public class CustomerVerification {
    public  void register()
     {
         
+        
           try 
         {
             System.out.println("Enter the UserName:");
             userName=sc.nextLine();
+            ParcelTracking p=new ParcelTracking(conn);
+            p.getUserName(userName);
+            String fetch="select user_name from register";
+            PreparedStatement pp=conn.prepareStatement(fetch);
+            ResultSet rr=pp.executeQuery();
+            while (rr.next()) {
+                if(rr.getString("user_name").equals(userName))
+                {
+                    System.out.println("The user already exists");
+                    return;
+                }
+            }
          
         
             System.out.println("Enter the password:");
@@ -137,10 +189,10 @@ System.out.println("Enter the address:");
 
  try {
              String search="select * from register where user_name=? and password=?";
-            PreparedStatement pp=conn.prepareStatement(search);
-            pp.setString(1, userName);
-            pp.setString(2, password);
-            ResultSet rs=pp.executeQuery();
+            PreparedStatement pp2=conn.prepareStatement(search);
+            pp2.setString(1, userName);
+            pp2.setString(2, password);
+            ResultSet rs=pp2.executeQuery();
            if(rs.next())
            {
             System.out.println("This account already exists");

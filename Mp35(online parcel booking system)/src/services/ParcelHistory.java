@@ -34,24 +34,29 @@ username=rr.getString("user_name");
             ps.setString(1, username);
 
             ResultSet rs=ps.executeQuery();
-           System.out.println("===============================================================================================================");
-System.out.printf("| %-9s | %-15s | %-18s | %-18s | %-20s | %-20s | %-12s |%n",
-        "Parcel ID", "User Name", "Sender Name", "Receiver Name",
-        "Sender Address", "Receiver Address", "Status");
-System.out.println("===============================================================================================================");
+           System.out.println("==========================================================================================================");
+System.out.printf("| %-8s | %-12s | %-12s | %-12s | %-15s | %-15s | %-10s |%n",
+        "ParcelID",
+        "User",
+        "Sender",
+        "Receiver",
+        "Sender Addr",
+        "Receiver Addr",
+        "Status");
+System.out.println("==========================================================================================================");
 
 while (rs.next()) {
-    System.out.printf("| %-9d | %-15s | %-18s | %-18s | %-20s | %-20s | %-12s |%n",
-            rs.getInt("parcel_id"),
-            rs.getString("user_name"),
-            rs.getString("sender_name"),
-            rs.getString("receiver_name"),
-            rs.getString("sender_add"),
-            rs.getString("receiver_add"),
-            rs.getString("status"));
+   System.out.printf("| %-8d | %-12.12s | %-12.12s | %-12.12s | %-15.15s | %-15.15s | %-10.10s |%n",
+        rs.getInt("parcel_id"),
+        rs.getString("user_name"),
+        rs.getString("sender_name"),
+        rs.getString("receiver_name"),
+        rs.getString("sender_add"),
+        rs.getString("receiver_add"),
+        rs.getString("status"));
 }
 
-System.out.println("===============================================================================================================");
+System.out.println("==========================================================================================================");
 
         }catch(SQLException e)
         {
