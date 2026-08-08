@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 import threads.*;
@@ -66,17 +69,20 @@ public class CustomerVerification {
                      String randomName[]=new String[5];
                      int randomNumber=0;
                      int i;
+                      HashSet<String>  h=null;
                      for( i=0;i<5;i++)
                     {
                         
-                    randomNumber=ranObj.nextInt(1,1000);
+                    randomNumber=ranObj.nextInt(1,100);
                     randomName[i]=userName+randomNumber;
+                   h=new HashSet<>(Arrays.asList(randomName));
+
                   
                     }
                  
                     System.out.print("Suggestions: ");
-                      for(i=0;i<5;i++)
-                    System.out.print(randomName[i]+","+" ");
+                    
+                    System.out.println(h);
                      
                      System.out.println();
                     return;
