@@ -13,16 +13,25 @@ import threads.*;
 
 public class CustomerVerification {
     Scanner sc;
+    
+
     Connection conn;
    
     public int otpgenerated;
+     DashBoard d;
    public CustomerVerification(Scanner sc,Connection conn)
        {
            
            this.sc=sc;
            this.conn=conn;
+           d=new DashBoard(conn,sc);
+          
+        
          
     }
+   
+   
+    
     
         String  mobNo=null;
         String password=null;
@@ -34,19 +43,73 @@ public class CustomerVerification {
         {
             System.out.println("Enter the UserName:");
             userName=sc.nextLine();
+        
          
         
             System.out.println("Enter the password:");
             password=sc.nextLine();
-            
-        }
-        catch(Exception e)
+        }catch(Exception e)
         {
             System.out.println("Invalid input pls enter the valid input only");
             sc.nextLine();
             menu();
 
         }
+                 int found=0;
+             try {
+            String search="select * from register where user_name=? and password=?";
+            PreparedStatement pp=conn.prepareStatement(search);
+            pp.setString(1, userName);
+            pp.setString(2, password);
+            ResultSet rs=pp.executeQuery();
+            if(rs.next())
+            {
+                 String query="insert into Login(user_name,password)values(?,?)";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, userName);
+   
+            ps.setString(2, password);
+            int rows=ps.executeUpdate();
+            if(rows>0)
+                {
+                    
+                        found=1;
+                    
+                    System.out.println("Login Successfull");
+                    d.viewDashboard();
+                    }
+                }
+                    if(found==0) 
+                    {
+                        System.out.println("Account not exists Pls register the account first..!");
+                        System.out.println("1.Try again\n2.Register\n3.Exit");
+                        System.out.println("Enter the choice[1-3]:");
+                        
+                        int subChoice=sc.nextInt();
+                         sc.nextLine();
+                        if(subChoice==1)
+                        {
+                           
+                            login();
+                        }else if(subChoice==2)
+                        {
+                            register();
+                        }else if(subChoice==3)
+                        {
+                            return;
+                        }else 
+                        {
+                            System.out.println("Pls enter the valid input");
+                            return;
+                        }
+                    }
+            
+        
+    }catch(SQLException e)
+    {
+        e.printStackTrace();
+    }
+
        
     }
    public  void register()
@@ -55,6 +118,11 @@ public class CustomerVerification {
         
           try 
         {
+            int found=0;
+            while (true) {
+                found=0;
+            
+
             System.out.println("Enter the UserName:");
             userName=sc.nextLine();
           
@@ -64,6 +132,7 @@ public class CustomerVerification {
             while (rr.next()) {
                 if(rr.getString("user_name").equals(userName))
                 {
+                    found=1;
                     Random ranObj=new Random();
                     System.out.println("This username is already taken");
                      String randomName[]=new String[5];
@@ -85,9 +154,20 @@ public class CustomerVerification {
                     System.out.println(h);
                      
                      System.out.println();
-                    return;
+                  break;
+
                 }
-            }
+             
+               
+               
+        }
+
+        if(found==1)
+        continue;
+        else 
+            break;
+       
+    }
          
         
             System.out.println("Enter the password:");
@@ -197,6 +277,8 @@ if(OTP==otpgenerated)
 {
     flag=1;
     System.out.println("Account registered Successfully");
+
+    d.viewDashboard();
    
     return;
 

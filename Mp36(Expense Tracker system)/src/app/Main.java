@@ -24,6 +24,7 @@ public class Main {
             
                  
               CustomerVerification cusObj=new CustomerVerification(sc, conn);
+              DashBoard dashObj=new DashBoard(conn,sc);
              
               cusObj.menu();
            
