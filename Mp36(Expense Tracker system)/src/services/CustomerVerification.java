@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,6 +121,8 @@ public class CustomerVerification {
         {
             int found=0;
             while (true) {
+                     ArrayList<String> storedUserName=new ArrayList<>();
+                   
                 found=0;
             
 
@@ -129,22 +132,42 @@ public class CustomerVerification {
             String fetch="select user_name from register";
             PreparedStatement pp=conn.prepareStatement(fetch);
             ResultSet rr=pp.executeQuery();
+           
             while (rr.next()) {
-                if(rr.getString("user_name").equals(userName))
+                 storedUserName.add(rr.getString("user_name"));
+                      
+                
+            }
+             
+            for(String user:storedUserName){
+             
+      
+     
+
+                if(user.equals(userName))
                 {
                     found=1;
                     Random ranObj=new Random();
                     System.out.println("This username is already taken");
-                     String randomName[]=new String[5];
+                    //  String randomName[]=new String[5];
                      int randomNumber=0;
                      int i;
                       HashSet<String>  h=null;
+                      String randomName[]=new String[5];
                      for( i=0;i<5;i++)
                     {
                         
                     randomNumber=ranObj.nextInt(1,100);
-                    randomName[i]=userName+randomNumber;
-                   h=new HashSet<>(Arrays.asList(randomName));
+
+                     randomName[i]=userName+randomNumber;
+                     if(storedUserName.contains(randomName[i]))
+                     {
+                        
+                        System.out.println(randomName[i]);
+                        System.out.println("equal");
+                        randomName[i]=randomName[i+1];
+                     }
+                                   h=new HashSet<>(Arrays.asList(randomName));
 
                   
                     }
@@ -190,7 +213,9 @@ public class CustomerVerification {
             password=sc.nextLine();
                 
             }
-
+            while (true) {
+                
+            
            System.out.println("Enter the mobile number:");
             mobNo = sc.next();
             sc.nextLine();
@@ -198,8 +223,12 @@ public class CustomerVerification {
 if (!mobNo.matches("[7-9][0-9]{9}")) {
     
     System.out.println("Invalid mobile number");
-    return ;
+    continue;
 }
+break;
+            }
+while (true) {
+    
 System.out.println("Enter the address:");
 
     address=sc.nextLine().trim();
@@ -207,8 +236,10 @@ System.out.println("Enter the address:");
     if( !address.matches(regex))
     {
         System.out.println("Invalid address pls enter the valid address");
-        return;
+        continue;
     }
+    break;
+}
 
  try {
              String search="select * from register where user_name=? and password=?";
