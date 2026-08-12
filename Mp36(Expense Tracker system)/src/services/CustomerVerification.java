@@ -44,6 +44,7 @@ public class CustomerVerification {
         {
             System.out.println("Enter the UserName:");
             userName=sc.nextLine();
+            // d.addIncome(userName);
         
          
         
@@ -77,7 +78,7 @@ public class CustomerVerification {
                         found=1;
                     
                     System.out.println("Login Successfull");
-                    d.viewDashboard();
+                    d.viewDashboard(userName);
                     }
                 }
                     if(found==0) 
@@ -163,8 +164,8 @@ public class CustomerVerification {
                      if(storedUserName.contains(randomName[i]))
                      {
                         
-                        System.out.println(randomName[i]);
-                        System.out.println("equal");
+                       
+                        
                         randomName[i]=randomName[i+1];
                      }
                                    h=new HashSet<>(Arrays.asList(randomName));
@@ -309,7 +310,7 @@ if(OTP==otpgenerated)
     flag=1;
     System.out.println("Account registered Successfully");
 
-    d.viewDashboard();
+    d.viewDashboard(userName);
    
     return;
 
