@@ -206,27 +206,57 @@ public class DashBoard {
                             sc.nextLine();
                             try 
                             {
-                                String query="Select amount from users where user_name=?";
+                                String query="Select total from total_income where user_name=?";
                                 PreparedStatement ps=conn.prepareStatement(query);
                               
                                 ps.setString(1, userName);
                                 ResultSet rs=ps.executeQuery();
                                 if(rs.next())
                                 {
-                                    double validateAmount=rs.getDouble("amount");
-                                    if(tempAmount>validateAmount)
+                                      double total=0.0;
+                                    double validateAmount=rs.getDouble("total");
+                                    System.out.println(validateAmount);
+                                     if(tempAmount>validateAmount)
                                     {
                                         System.out.println("Monthly Budget Exceeded");
                                         System.out.println("Wallet Balance: "+validateAmount);
-                                        
+                                                                            
                                         continue;
                                     }
 
+                                 total =validateAmount-tempAmount;
+                                 System.out.println(total);
+                                 String update="update total_income set total=? where user_name=?";
+                                 PreparedStatement preparedStatement=conn.prepareStatement(update);
+                                 preparedStatement.setDouble(1, total);
+                                 preparedStatement.setString(2, userName);
+                                 preparedStatement.executeUpdate();
+                                 
                                        String description;
                      System.out.println("Enter the description: ");
                      description=sc.nextLine();
-                     System.out.println("Expense info added successfully");
-                     break;
+                     String expenses="insert into expenses(category,amount,description)values(?,?,?)";
+                     PreparedStatement expense=conn.prepareStatement(expenses);
+                     expense.setString(1, selectedCat);
+                     expense.setDouble(2, tempAmount);
+                     expense.setString(3, description);
+                     int r=expense.executeUpdate();
+                    
+                     
+                     
+                                 if(r>0)
+                                 {
+                                    System.out.println("Expenses Updated successfully");
+                                    break;
+                                 }else
+                                 {
+                                    System.out.println("Unable to update the expenses");
+                                 }
+                                    
+                                   
+                                   
+                                    
+                                   
                                 }else 
                                 {
                                    
