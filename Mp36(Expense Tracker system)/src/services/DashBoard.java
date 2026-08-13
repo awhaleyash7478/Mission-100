@@ -1,9 +1,12 @@
 package services;
 import java.util.*;
+ import java.time.Year;
+
 
 import javax.naming.spi.DirStateFactory.Result;
 
 import java.sql.*;
+import java.time.Year;
 public class DashBoard {
     Connection conn;
     Scanner sc;
@@ -296,6 +299,76 @@ public class DashBoard {
 
         
     }
+    public void setMonthlyBudget()
+    {
+             double budget=0.0;
+             String currentMonth=null;
+        while (true) {
+            
+        
+        System.out.println("Enter the month to set the Budget:");
+        String month=null;
+ 
+       
+
+        try 
+        {
+            
+            month=sc.nextLine();
+            int currentYear = Year.now().getValue();
+System.out.println("Current Year: "+currentYear);
+currentMonth=month+currentYear;
+System.out.println("current month: "+currentMonth);
+
+        }catch(Exception e)
+        {
+            System.out.println("Invalid input");
+        }
+        String regex = "(?i)^(january|february|march|april|may|june|july|august|september|october|november|december)$";
+        if(!month.matches(regex))
+        {
+            System.out.println("Pls enter the valid month eg:January]");
+            continue;
+
+        }
+        System.out.println("Enter the Budget for "+month+": ");
+   
+        try
+{        budget=sc.nextDouble();
+
+     
+    }catch(Exception e)
+    {
+        System.out.println("Invalid budget entered");
+        continue;
+    }
+    if(budget<=0)
+    {
+        System.out.println("Pls enter the valid budget");
+        continue;
+    }
+    break;
+}
+try 
+{
+    String query="insert into monthlyBudget(month,budget)values(?,?)";
+    PreparedStatement preparedStatement=conn.prepareStatement(query);
+    preparedStatement.setString(1, currentMonth);
+    preparedStatement.setDouble(2, budget);
+    int rows=preparedStatement.executeUpdate();
+    if(rows>0)
+    {
+        System.out.println("Budget set Successfully");
+    }else 
+    {
+        System.out.println("Unable to add the budget");
+        setMonthlyBudget();
+    }
+}catch(Exception e)
+{
+    e.printStackTrace();
+}
+    }
     public void viewDashboard(String userName)
     {
         
@@ -308,6 +381,7 @@ public class DashBoard {
             System.out.println("Enter your choice[1-8]:");
             
             ch=sc.nextInt();
+            sc.nextLine();
         }catch(Exception e)
         {
             System.out.println("Pls enter the digits only[eg:1 for Add Income]");
@@ -323,6 +397,10 @@ public class DashBoard {
                 addExpense();
                 System.out.println("hey came here");
                 break;
+            case 3:
+                setMonthlyBudget();
+                break;
+
         
             default:
                 System.out.println("Pls enter the valid choice between 1-8");
