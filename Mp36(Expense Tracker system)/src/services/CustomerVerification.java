@@ -302,6 +302,8 @@ OtpValidationThread t=new OtpValidationThread(this);
 t.setDaemon(true);
 t.start();
 int OTP;
+while(true)
+{
 System.out.println("Enter the otp:");
 OTP=sc.nextInt();
 int flag=0;
@@ -312,13 +314,40 @@ if(OTP==otpgenerated)
 
     d.viewDashboard(userName);
    
-    return;
+  break;
 
-}else if(flag==0) 
+}else if(otpgenerated==2)
+{
+   
+    while (true) {
+        
+    
+    System.out.println("OTP Timeout\n1.Resend OTP\n2.Exit");
+    System.out.println("Enter your choice: ");
+    int choice=sc.nextInt();
+    if(choice==1)
+    {
+        generateOtp();
+        break;
+
+    }else if(choice==2)
+    {
+        return;
+    }else
+    {
+        System.out.println("Pls select the valid option only[eg:1 for resend]");
+        continue;
+
+    }
+}
+
+}
+else if(flag==0) 
 {
     System.out.println("Invalid otp");
-    return;
+    continue;
 
+}
 }
         }
     public void  menu()

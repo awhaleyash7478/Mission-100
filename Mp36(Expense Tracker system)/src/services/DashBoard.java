@@ -69,15 +69,59 @@ public class DashBoard {
             ps.setDouble(2,amount);
             ps.setString(3, source);
             ps.setDouble(4, salary);
-            int rows=ps.executeUpdate();
+          ps.executeUpdate();
+           double total=0;
+         
+            int rows=0;
+           
+            String fetch="select total from total_income where user_name=?";
+            PreparedStatement ppp=conn.prepareStatement(fetch);
+            ppp.setString(1, userName);
+            ResultSet resultSet=ppp.executeQuery();
+            if(resultSet.next())
+            {
+            total=resultSet.getDouble("total");
+            System.out.println("total: "+total);
+              total=total+amount;
+              System.out.println("total: "+total);
+
+               String query2="update total_income set total=? where user_name=?";
+            PreparedStatement pp=conn.prepareStatement(query2);
+            pp.setDouble(1, total);
+            pp.setString(2, userName);
+           
+            rows=pp.executeUpdate();
             if(rows>0)
             {
-                System.out.println("Income details added successfully");
+                System.out.println("Income details updated successfully");
+            }else 
+            {
+                System.out.println("Unable to update income details");
+
+            }
+            }else 
+            {
+                
+               String query2="insert into total_income(user_name,total)values(?,?)";
+
+            PreparedStatement pp=conn.prepareStatement(query2);
+         
+            pp.setString(1, userName);
+               pp.setDouble(2, total);
+           
+            int rowsss=pp.executeUpdate();
+            if(rowsss>0)
+            {
+                System.out.println("Income details added Successfully");
             }else 
             {
                 System.out.println("Unable to add income details");
-
             }
+               
+            }
+            
+            
+               
         }catch(SQLException e)
         {
             e.printStackTrace();

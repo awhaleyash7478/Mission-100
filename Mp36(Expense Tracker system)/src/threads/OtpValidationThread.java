@@ -13,8 +13,8 @@ public class OtpValidationThread extends Thread {
     try 
     {
       
-        Thread.sleep(30000);
-        obj.otpgenerated=0;
+        Thread.sleep(300000);
+        obj.otpgenerated=2;
     
 
     }catch(InterruptedException e)
