@@ -152,7 +152,7 @@ public class DashBoard {
                         "7.Entertainment\n" + //
                         "8.Fuel\n" + //
                         "9.Rent\n" + //
-                        "10.Other");
+                        "10.Exit");
                         try 
                         {
          category=sc.nextInt();
@@ -190,10 +190,8 @@ public class DashBoard {
                                 selectedCat="Rent";
                                 break;
                             case 10:
-                                selectedCat="Other";
-                                System.out.println("Pls enter the cateogory: ");
-                                other=sc.nextLine();
-                                break;
+                                return;
+                          
                         
                             default:
                                 System.out.println("Invalid entry pls choose the valid option");
@@ -233,7 +231,7 @@ public class DashBoard {
                                         System.out.println("Monthly Budget Exceeded");
                                         System.out.println("Wallet Balance: "+validateAmount);
                                         System.out.println("1.Try Again\n2.Update Monthly budget");
-                                        sc.nextLine();
+                                    
                                         int choice=sc.nextInt();
                                        if(choice==1)                      
                                        {
@@ -241,6 +239,7 @@ public class DashBoard {
                                        }else if(choice==2)
                                        {
                                         updateMonthlyBudget();
+                                        
                                        }
                                     }
 
@@ -322,6 +321,7 @@ public class DashBoard {
     }
     public void updateMonthlyBudget()
     {
+
         double fetchedBudget=0.0;
         double updateAmount=0.0;
         double finalBudget=0.0;
@@ -334,6 +334,8 @@ public class DashBoard {
             if(rr.next())
             fetchedBudget=rr.getDouble("budget");
 
+     
+
         }catch(SQLException e)
         {
             e.printStackTrace();
@@ -343,6 +345,7 @@ public class DashBoard {
         
         try {
             System.out.println("Enter the Amount:");
+            sc.nextLine();
             updateAmount=sc.nextDouble();
         } catch (Exception e) {
             System.out.println("Pls enter the valid amount only");
@@ -366,7 +369,7 @@ public class DashBoard {
             if(rows>0)
             {
                 System.out.println("Monthly budget updated successfuly from "+fetchedBudget+"to "+finalBudget);
-                return;
+            addExpense();
             }else
             {
                 System.out.println("Unable to update the monthly Budget");
@@ -557,7 +560,7 @@ System.out.println("-----------------------------------------------------");
             PreparedStatement ps=conn.prepareStatement(query);
            
             ps.setString(1, userName);
-            System.out.println("DEBUG userName = [" + userName + "]");
+            
             ResultSet rs=ps.executeQuery();
             int found=0;
             System.out.printf("+------------+----------+--------+-------------+%n");
@@ -612,13 +615,14 @@ System.out.printf("+------------+----------+--------+-------------+%n");
         System.out.println("Pls add  the income field to generate the report");
         return;
      }  
-            String query2="select amount from expenses where user_name=?";
+            String query2="select sum(amount) as totalExpense from expenses where user_name=?";
             PreparedStatement ps2=conn.prepareStatement(query2);
             ps2.setString(1, userName);
             ResultSet rs2=ps2.executeQuery();
             if(rs2.next())
                 {
-                    totalExpense=rs2.getDouble("amount");
+                    totalExpense=rs2.getDouble("totalExpense");
+          
                     found=2;
                     
                 }
@@ -725,7 +729,7 @@ viewDashboard(userName);
                 break;
             case 2:
                 addExpense();
-                System.out.println("hey came here");
+              
                 break;
             case 3:
                 setMonthlyBudget();
