@@ -97,6 +97,7 @@ public class DashBoard {
             if(rows>0)
             {
                 System.out.println("Income details updated successfully");
+               viewDashboard(userName);
             }else 
             {
                 System.out.println("Unable to update income details");
@@ -116,6 +117,7 @@ public class DashBoard {
             if(rowsss>0)
             {
                 System.out.println("Income details added Successfully");
+               viewDashboard(userName);
             }else 
             {
                 System.out.println("Unable to add income details");
@@ -209,7 +211,7 @@ public class DashBoard {
                             sc.nextLine();
                             try 
                             {
-                                String query="Select total from total_income where user_name=?";
+                                String query="Select budget from monthlyBudget where user_name=?";
                                 PreparedStatement ps=conn.prepareStatement(query);
                               
                                 ps.setString(1, userName);
@@ -217,7 +219,7 @@ public class DashBoard {
                                 if(rs.next())
                                 {
                                       double total=0.0;
-                                    double validateAmount=rs.getDouble("total");
+                                    double validateAmount=rs.getDouble("budget");
                                     System.out.println(validateAmount);
                                      if(tempAmount>validateAmount)
                                     {
@@ -228,8 +230,8 @@ public class DashBoard {
                                     }
 
                                  total =validateAmount-tempAmount;
-                                 System.out.println(total);
-                                 String update="update total_income set total=? where user_name=?";
+                                 System.out.println("Wallet Balance: "+total);
+                                 String update="update monthlyBudget set budget=? where user_name=?";
                                  PreparedStatement preparedStatement=conn.prepareStatement(update);
                                  preparedStatement.setDouble(1, total);
                                  preparedStatement.setString(2, userName);
@@ -302,23 +304,22 @@ public class DashBoard {
     public void setMonthlyBudget()
     {
              double budget=0.0;
-             String currentMonth=null;
+                 String month=null;
+                        int currentYear=0;
+ 
         while (true) {
             
         
         System.out.println("Enter the month to set the Budget:");
-        String month=null;
- 
+    
        
 
         try 
         {
             
             month=sc.nextLine();
-            int currentYear = Year.now().getValue();
-System.out.println("Current Year: "+currentYear);
-currentMonth=month+currentYear;
-System.out.println("current month: "+currentMonth);
+             currentYear = Year.now().getValue();
+
 
         }catch(Exception e)
         {
@@ -327,7 +328,7 @@ System.out.println("current month: "+currentMonth);
         String regex = "(?i)^(january|february|march|april|may|june|july|august|september|october|november|december)$";
         if(!month.matches(regex))
         {
-            System.out.println("Pls enter the valid month eg:January]");
+            System.out.println("Pls enter the valid month [eg:January]");
             continue;
 
         }
@@ -351,10 +352,11 @@ System.out.println("current month: "+currentMonth);
 }
 try 
 {
-    String query="insert into monthlyBudget(month,budget)values(?,?)";
+    String query="insert into monthlyBudget(month,budget,year)values(?,?,?)";
     PreparedStatement preparedStatement=conn.prepareStatement(query);
-    preparedStatement.setString(1, currentMonth);
+    preparedStatement.setString(1, month);
     preparedStatement.setDouble(2, budget);
+    preparedStatement.setInt(3, currentYear);
     int rows=preparedStatement.executeUpdate();
     if(rows>0)
     {
@@ -369,6 +371,215 @@ try
     e.printStackTrace();
 }
     }
+    public void viewBalance()
+    {
+        double fetchedBudget=0.0;
+        try
+        {
+            String query="select budget from monthlyBudget where user_name=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, userName);
+            ResultSet rs=ps.executeQuery();
+            if(rs.next())
+            {
+                fetchedBudget=rs.getDouble("budget");
+                System.out.println("Total Wallet Balance: "+fetchedBudget);
+
+            }else 
+            {
+                System.out.println("Pls Set the monthly budget First");
+                System.out.println("1.Set Budget\n2.Exit");
+                int choice=sc.nextInt();
+                if(choice==1)
+                {
+                    setMonthlyBudget();
+                }else
+                {
+                    return;
+                }
+            }
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public void viewIncomeHis()
+    {
+        int found=0;
+        try 
+        {
+            String query="select * from users where user_name=?";
+            PreparedStatement preparedStatement=conn.prepareStatement(query);
+            preparedStatement.setString(1, userName);
+            ResultSet rs=preparedStatement.executeQuery();
+            System.out.printf("%-12s %-12s %-12s %-15s%n",
+        "user_name", "amount", "source", "salary");
+
+System.out.println("-----------------------------------------------------");
+            while (rs.next()) {
+                found=1;
+                 System.out.printf("%-12s %10.2f %-12s %15.2f%n",
+            rs.getString("user_name"),
+            rs.getDouble("amount"),
+            rs.getString("source"),
+            rs.getDouble("salary"));
+
+                
+            }
+            if(found==0)
+            {
+                System.out.println("NO Income History");
+                 return;
+            }
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public void viewExpenseHis()
+    {
+        try 
+        {
+            String query="select * from expenses where user_name=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, userName);
+            ResultSet rs=ps.executeQuery();
+            int found=0;
+            System.out.printf("+------------+----------+--------+-------------+%n");
+System.out.printf("| %-10s | %-8s | %6s | %-11s |%n",
+        "expense_id", "category", "amount", "description");
+System.out.printf("+------------+----------+--------+-------------+%n");
+
+
+            while (rs.next()) {
+                found=1;
+ System.out.printf("| %10d | %-8s | %6.2f | %-11s |%n",
+            rs.getInt("expense_id"),
+            rs.getString("category"),
+            rs.getDouble("amount"),
+            rs.getString("description"));
+                
+            }
+            System.out.printf("+------------+----------+--------+-------------+%n");
+            if(found==0)
+            {
+                System.out.println("NO Expense History");
+                return;
+            }
+        
+    }
+    catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public void viewReport()
+    {
+        int found=0;
+        try {
+            String query1="select amount from users where user_name=?";
+            PreparedStatement ps1=conn.prepareStatement(query1);
+            ps1.setString(1, userName);
+            ResultSet rs1=ps1.executeQuery();
+            double totalIncome=0.0;
+            double totalExpense=0.0;
+            if(rs1.next())
+                {
+                    totalIncome=rs1.getDouble("amount");
+                    found=1;
+                    
+                }
+                   if(found!=1)
+     {
+        System.out.println("Pls add  the income field to generate the report");
+        return;
+     }  
+            String query2="select amount from expenses where user_name=?";
+            PreparedStatement ps2=conn.prepareStatement(query2);
+            ps2.setString(1, userName);
+            ResultSet rs2=ps2.executeQuery();
+            if(rs2.next())
+                {
+                    totalExpense=rs2.getDouble("amount");
+                    found=2;
+                    
+                }
+                double fetchedBudget=0.0;
+             String query3="select budget from monthlyBudget where user_name=?";
+            PreparedStatement ps3=conn.prepareStatement(query3);
+            ps3.setString(1, userName);
+            ResultSet rs3=ps3.executeQuery();
+            if(rs3.next())
+            {
+
+                fetchedBudget=rs3.getDouble("budget");
+            
+                System.out.println("Total Wallet Balance: "+fetchedBudget);
+
+            }
+            double maxExpense=0.0;
+            String query4="select Max(amount) from expenses where user_name=?";
+            PreparedStatement ps4=conn.prepareStatement(query4);
+            ps4.setString(1, userName);
+            ResultSet rs4=ps4.executeQuery();
+            if(rs4.next())
+            {
+                maxExpense=rs4.getDouble("amount");
+      
+
+            }
+            double highestIncome=0.0;
+            String query5="select max(amount) from users where user_name=?";
+            PreparedStatement ps5=conn.prepareStatement(query5);
+            ps5.setString(1, userName);
+        ResultSet rs5=ps5.executeQuery();
+        if(rs5.next())
+        {
+            highestIncome=rs5.getDouble("amount");
+            
+        }
+        double actualBudget=0.0;
+        String query6="select amount from users where user_name=?";
+        PreparedStatement ps6=conn.prepareStatement(query6);
+        ps6.setString(1, "amount");
+        ResultSet rs6=ps6.executeQuery();
+        if(rs6.next())
+        {
+            actualBudget=rs6.getDouble("amount");
+     
+        }
+    double budgetUsed=0.0;
+    budgetUsed=actualBudget-fetchedBudget;
+   System.out.println("========================================");
+System.out.println("           FINANCIAL REPORT             ");
+System.out.println("========================================");
+
+System.out.println("Total Income        : ₹ " + totalIncome);
+System.out.println("Total Expense       : ₹ " + totalExpense);
+System.out.println("Current Balance     : ₹ " + fetchedBudget);
+System.out.println("Highest Expense     : ₹ " + maxExpense);
+System.out.println("Highest Income      : ₹ " + highestIncome);
+
+System.out.println("----------------------------------------");
+
+System.out.println("Budget              : ₹ " + actualBudget);
+System.out.println("Budget Used         : ₹ " + budgetUsed);
+System.out.println("Remaining Budget    : ₹ " + fetchedBudget);
+
+System.out.println("----------------------------------------");
+
+
+
+System.out.println("========================================");
+  
+
+        
+                       
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void viewDashboard(String userName)
     {
         
@@ -400,8 +611,20 @@ try
             case 3:
                 setMonthlyBudget();
                 break;
-
-        
+            case 4:
+                viewBalance();
+                break;
+            case 5:
+                viewIncomeHis();
+                break;
+            case 6:
+                viewExpenseHis();
+                break;
+            case 7:
+                viewReport();
+                break;
+            case 8:
+                return;
             default:
                 System.out.println("Pls enter the valid choice between 1-8");
                 break;
