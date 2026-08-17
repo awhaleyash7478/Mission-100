@@ -1,7 +1,14 @@
 package services;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Scanner;
+
+import javax.naming.spi.DirStateFactory.Result;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 import threads.AttemptValidationThread;
@@ -56,16 +63,65 @@ public class AddMoney {
         password=sc.nextLine();
    
         CustomerVerification cusObj=new CustomerVerification(sc, conn);
-      
-        
+
+      Double fetchedbalance=0.0;
+         String username=CustomerVerification.userName;
+      try {
+        String query="select totalbalance from usertotalbalance where user_name=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, username);
+        ResultSet rs=ps.executeQuery();
+        if(rs.next())
+        {
+          fetchedbalance=rs.getDouble("totalbalance");
+          System.out.println("previous balance :"+fetchedbalance);
+        }
+
+      } catch (Exception e) {
+        e.printStackTrace();      }
+        Double totalbalance=amount+fetchedbalance;
         String fetchedpass=cusObj.password;
 
    
     
        if(password.equals(fetchedpass))
        {
-        System.out.println("Money added successfully");
-        break;
+        try {
+          LocalDate currentDate=LocalDate.now();
+          LocalTime currentTime=LocalTime.now();
+       
+
+
+          String query="insert into usersdata(user_name,balance,date,time)values(?,?,?,?)";
+          PreparedStatement ps=conn.prepareStatement(query);
+          ps.setString(1,username );
+          ps.setDouble(2, amount);
+          ps.setObject(3, currentDate);
+          ps.setObject(4, currentTime);
+          
+          String query2="insert into usertotalbalance (user_name ,totalbalance)values(?,?)";
+          PreparedStatement ps2=conn.prepareStatement(query2);
+          ps2.setString(1, username);
+          ps2.setDouble(2, totalbalance);
+          int rows=ps2.executeUpdate();
+          System.out.println("added balance: "+totalbalance);
+          
+          if(rows>0)
+          {
+            System.out.println("Amount added successfully");
+            break;
+          }else 
+          {
+            System.out.println("Unable to add the amount");
+            break;
+          }
+
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+
+      
        }else
        {
         System.out.println("Invalid password attempts left "+countattempt);

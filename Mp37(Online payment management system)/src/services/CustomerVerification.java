@@ -36,7 +36,7 @@ public class CustomerVerification {
     
         String  mobNo=null;
        static String password=null;
-        String userName;
+       static String userName;
         String address=null;
     public void  login()
     {
