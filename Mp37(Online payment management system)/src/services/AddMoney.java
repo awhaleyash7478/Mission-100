@@ -98,6 +98,31 @@ public class AddMoney {
           ps.setDouble(2, amount);
           ps.setObject(3, currentDate);
           ps.setObject(4, currentTime);
+          ps.executeUpdate();
+          String sql="select user_name from usertotalbalance where user_name=?";
+          PreparedStatement preparedStatement=conn.prepareStatement(sql);
+          preparedStatement.setString(1, username);
+          ResultSet resultSet=preparedStatement.executeQuery();
+          if(resultSet.next())
+          {
+            String update="update usertotalbalance set totalbalance=? where user_name=?";
+            PreparedStatement pp=conn.prepareStatement(update);
+            pp.setDouble(1, totalbalance);
+            pp.setString(2, username);
+            int rows=pp.executeUpdate();
+            if(rows>0)
+            {
+              System.out.println("Balance Updated Successfully");
+              System.out.println("Current balance: "+totalbalance);
+               break;  
+            }else 
+            {
+              System.out.println("Unable to Update the Balance");
+            break;
+            }
+
+
+          }
           
           String query2="insert into usertotalbalance (user_name ,totalbalance)values(?,?)";
           PreparedStatement ps2=conn.prepareStatement(query2);
@@ -109,6 +134,7 @@ public class AddMoney {
           if(rows>0)
           {
             System.out.println("Amount added successfully");
+            System.out.println("Current balance: "+totalbalance);
             break;
           }else 
           {
