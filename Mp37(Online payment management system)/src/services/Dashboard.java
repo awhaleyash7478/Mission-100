@@ -32,6 +32,7 @@ public class Dashboard {
                                 try
                                 {
                  choice  =sc.nextInt();
+                 sc.nextLine();
                                 }catch(Exception e)
                                 {
                                     System.out.println("Pls enter the valid input[eg:-1 for Add Money]");
@@ -42,6 +43,10 @@ public class Dashboard {
                                         addObj.addMoney();
                                         
                                         
+                                        break;
+                                    case 2:
+                                        SendMoney sendObj=new SendMoney(sc,conn);
+                                        sendObj.sendMoney();
                                         break;
                                 
                                     default:
