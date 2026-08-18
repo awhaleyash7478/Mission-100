@@ -6,23 +6,34 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import threads.AttemptValidationThread;
+
 public class SendMoney {
+  
+    String currUser=CustomerVerification.userName;
+      AttemptValidationThread a;
     Connection conn;
     Scanner sc;
     public SendMoney(Scanner sc,Connection conn)
     {
         this.conn=conn;
         this.sc=sc;
-
+a=new AttemptValidationThread();
     }
     public void sendMoney()
     {
+        if(AttemptValidationThread.sleep==1)
+        {
+            System.out.println("Pls wait Your attempt limit is exceeded ");
+            return;
+        }
+        
         String mobno=null;
          String fetchedName=null;
         while (true) {
             
         
-            System.out.println("Enter the Mobile Number: ");
+            System.out.println("Enter the Receiver's Mobile Number: ");
        
             mobno=sc.nextLine();
             if (!mobno.matches("[7-9][0-9]{9}")) {
@@ -42,21 +53,23 @@ public class SendMoney {
                 {
                     
                   fetchedName =rs.getString("user_name");
-                  if(fetchedName.equals(CustomerVerification.userName))
+                  if(fetchedName.equals(currUser))
                   {
                     System.out.println("Sender and Receiver Must be different");
                     // sc.nextLine();
                     continue;
                   }
+                  System.out.println("--------------------------------");
 
-                    System.out.println("Receiver Found\r\n" + //
-                                                "\r\n" + //
-                                                "Name: "+fetchedName+"\n"+
+                    System.out.println("Receiver Found" + //
+                                             "\nName: "+fetchedName+"\n"+
                                                 "Mobile: "+mobno +"\n"+
                                                 
                                                 "Continue?\n" + 
                                                 "1. Yes\n2. No");
+                  System.out.println("--------------------------------");
                                                 choice=sc.nextInt();
+                
 
                 }else 
                 {
@@ -92,6 +105,7 @@ public class SendMoney {
                     System.out.println("Enter the amount: ");
                     try {
                         amount=sc.nextDouble();
+                           sc.nextLine();
                     
                     } catch (Exception e) {
                         System.out.println("Invalid amount");
@@ -106,35 +120,84 @@ public class SendMoney {
                     try {
                         String fetch="select totalbalance from usertotalbalance where user_name=?";
                         PreparedStatement preparedStatement=conn.prepareStatement(fetch);
-                        preparedStatement.setString(1,fetchedName);
+                        preparedStatement.setString(1,currUser);
                         ResultSet resultSet=preparedStatement.executeQuery();
                   
                         if(resultSet.next())
                         {
                          fetchedamount=resultSet.getDouble("totalbalance");
-                         System.out.println("fetched amount: "+fetchedamount);
+                        
 
                         }
                         if(amount>fetchedamount)
                         {
+                        System.out.println("--------------------------------");
                             System.out.println("Insufficient balance in the account\nTransaction Failed...\nThank-You");
-                            break;
+                            System.out.println("--------------------------------");
+                            return;
                         }
+                        String pass=null;
+
+                        String password=CustomerVerification.password;
+                        int attempts=3;
+                          while (true) {
+                            if(attempts<0)
+                            {
+                                System.out.println("Attempt limit exceeded pls try again after 30 sec");
+                                 
+                                 a.start();
+                                 return;
+
+                            }
+                        System.out.println("Enter the Password:");
+                     
+                        pass=sc.nextLine();
+                      
+                            
+                        
+                        if(!pass.equals(password))
+                        {
+                            System.out.println("Invalid password attempts left "+attempts);
+                            attempts--;
+                           
+                            continue;
+                        }
+                    }
+                        
+
                         
 
                     } catch (Exception e) {
                         e.printStackTrace();
                         
                     }
+                    double receiverbal=0.0;
+                    try {
+                         String fetch="select totalbalance from usertotalbalance where user_name=?";
+                        PreparedStatement preparedStatement=conn.prepareStatement(fetch);
+                        preparedStatement.setString(1,fetchedName);
+                        ResultSet resultSet=preparedStatement.executeQuery();
+                        
+                        if(resultSet.next())
+                        {
+                            receiverbal=resultSet.getDouble("totalbalance");
+                          
+
+                        }
+
+                  
+                    } catch (Exception e) {
+                     e.printStackTrace();
+                    }
                     while (true) {
                         int option=0;
                         
                     
                     System.out.println("--------------------------------\nPAYMENT CONFIRMATION\n--------------------------------");
-                    System.out.println("From: "+CustomerVerification.userName);
+                    System.out.println("From: "+currUser);
                     System.out.println("To: "+fetchedName);
                     System.out.println("Amount: "+amount);
-                    System.out.println("Confirm Payment?");
+                    System.out.println("\nConfirm Payment?");
                     System.out.println("1.Confirm\n2.Cancel");
                     System.out.println("--------------------------------");
                     try 
@@ -147,16 +210,27 @@ public class SendMoney {
                     }
                     if(option==1)
                     {
-                        double finalamount=fetchedamount+amount;
+                        
+                        double finalamount=receiverbal+amount;
+                        double senderbal=fetchedamount-amount;
                         String pay="update usertotalbalance set totalbalance=? where user_name=?";
                         PreparedStatement pp=conn.prepareStatement(pay);
                         pp.setDouble(1, finalamount);
                         pp.setString(2, fetchedName);
-                        int rows=pp.executeUpdate();
+                        pp.executeUpdate();
+                        String minus="update usertotalbalance set totalbalance=? where user_name=?";
+                        PreparedStatement p=conn.prepareStatement(minus);
+                        p.setDouble(1, senderbal);
+                        
+                        p.setString(2 ,currUser);
+                        int rows=p.executeUpdate();
+                        
+
                         if(rows>0)
                         {
                             System.out.println("Transaction Done Succesfully");
-                            System.out.println("final amount: "+finalamount);
+                            
+                           
                             return;
                         }else 
                         {

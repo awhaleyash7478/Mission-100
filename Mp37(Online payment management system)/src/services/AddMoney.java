@@ -74,7 +74,7 @@ public class AddMoney {
         if(rs.next())
         {
           fetchedbalance=rs.getDouble("totalbalance");
-          System.out.println("previous balance :"+fetchedbalance);
+          
         }
 
       } catch (Exception e) {
