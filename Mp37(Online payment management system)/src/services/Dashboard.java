@@ -48,6 +48,10 @@ public class Dashboard {
                                         SendMoney sendObj=new SendMoney(sc,conn);
                                         sendObj.sendMoney();
                                         break;
+                                    case 3:
+                                        RequestMoney r=new RequestMoney(conn, sc);
+                                        r.requestMoney();
+                                        break;
                                 
                                     default:
                                         System.out.println("Invalid choice [allowed is 1-6]");

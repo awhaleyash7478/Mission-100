@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Scanner;
 
 import threads.AttemptValidationThread;
@@ -161,6 +163,9 @@ a=new AttemptValidationThread();
                             attempts--;
                            
                             continue;
+                        }else 
+                        {
+                            break;
                         }
                     }
                         
@@ -224,11 +229,25 @@ a=new AttemptValidationThread();
                         
                         p.setString(2 ,currUser);
                         int rows=p.executeUpdate();
+                        LocalDate currDate=LocalDate.now();
+                        LocalTime currtime=LocalTime.now();
+                        String transaction="send";
                         
 
                         if(rows>0)
                         {
                             System.out.println("Transaction Done Succesfully");
+                            String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction)values(?,?,?,?,?,?)";
+                            PreparedStatement pr=conn.prepareStatement(history);
+                            pr.setDouble(1, amount);
+                            pr.setString(2,currUser );
+                            pr.setString(3, fetchedName);
+                            pr.setObject(4, currDate);
+                            pr.setObject(5, currtime);
+                            pr.setString(6, transaction);
+                            pr.executeUpdate();
+                                  
+
                             
                            
                             return;
