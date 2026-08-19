@@ -133,6 +133,14 @@ public class RequestMoney {
                             continue;
                         }
                         System.out.println("Money Requested Successfully");
+                         int notification_id=2;
+                        String notify="insert into notification (notification_type,sender,receiver,amount)values(?,?,?,?)";
+                        PreparedStatement pn=conn.prepareStatement(notify);
+                        pn.setInt(1, notification_id);
+                        pn.setString(2, currUser);
+                        pn.setString(3, fetchedName);
+                        pn.setDouble(4, amount);
+                        pn.executeUpdate();
                         return;
                     }
                     

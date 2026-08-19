@@ -36,7 +36,7 @@ public class CustomerVerification {
     
         String  mobNo=null;
        static String password=null;
-       static String userName;
+      public  static String userName;
         String address=null;
     public void  login()
     {
@@ -78,6 +78,10 @@ public class CustomerVerification {
                         found=1;
                     
                     System.out.println("Login Successfull");
+
+                    NotificationThread n=new NotificationThread(conn);
+                    
+                    n.start();
                     
                     dasObj.viewDashboard();
                    

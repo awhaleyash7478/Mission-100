@@ -250,12 +250,30 @@ a=new AttemptValidationThread();
 
                             
                            
-                            return;
+                            
                         }else 
                         {
                             System.out.println("Transaction Failed");
-                            return;
+                          
                         }
+
+                        int notification_id=1;
+                        String notify="insert into notification (notification_type,sender,receiver,amount,date,time,user_name)values(?,?,?,?,?,?,?)";
+                        PreparedStatement pn=conn.prepareStatement(notify);
+                        pn.setInt(1, notification_id);
+                        pn.setString(2, currUser);
+                        pn.setString(3, fetchedName);
+                        pn.setDouble(4, amount);
+                        pn.setObject(5, currDate);
+                        pn.setObject(6, currtime);
+                        pn.setString(7, fetchedName);
+
+                        
+                        pn.executeUpdate();
+                        return;
+
+
+                        
 
                     }
 
