@@ -55,7 +55,7 @@ public class Dashboard {
                                     case 4:
                                         ApproveRequest a=new ApproveRequest(conn, sc);
 
-                                        a.paymentRequest();
+                                        a.viewpaymentRequest();
                                         break;
                                     case 7:
                                         return;

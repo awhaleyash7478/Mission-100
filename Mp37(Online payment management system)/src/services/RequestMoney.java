@@ -148,6 +148,17 @@ public class RequestMoney {
                         pn.setObject(6, currdate);
                         pn.setObject(7, currtime);
                         pn.executeUpdate();
+                        String request="insert into paymentrequest (user_name,sender,amount,date,time)values(?,?,?,?,?)";
+                        PreparedStatement pn1=conn.prepareStatement(request);
+                        pn1.setString(1, fetchedName);
+                        pn1.setString(2, currUser);
+                        
+                        pn1.setDouble(3, amount);
+                     
+                        pn1.setObject(4, currdate);
+                        pn1.setObject(5, currtime);
+                        pn1.executeUpdate();
+
 
                         return;
                     }
