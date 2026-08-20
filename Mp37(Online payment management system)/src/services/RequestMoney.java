@@ -1,5 +1,7 @@
 package services;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Scanner;
 
 import threads.AttemptValidationThread;
@@ -132,15 +134,21 @@ public class RequestMoney {
                            
                             continue;
                         }
+                        LocalDate currdate=LocalDate.now();
+                        LocalTime currtime=LocalTime.now();
                         System.out.println("Money Requested Successfully");
                          int notification_id=2;
-                        String notify="insert into notification (notification_type,sender,receiver,amount)values(?,?,?,?)";
+                        String notify="insert into notification (notification_type,sender,receiver,amount,user_name,date,time)values(?,?,?,?,?,?,?)";
                         PreparedStatement pn=conn.prepareStatement(notify);
                         pn.setInt(1, notification_id);
                         pn.setString(2, currUser);
                         pn.setString(3, fetchedName);
                         pn.setDouble(4, amount);
+                        pn.setString(5, fetchedName);
+                        pn.setObject(6, currdate);
+                        pn.setObject(7, currtime);
                         pn.executeUpdate();
+
                         return;
                     }
                     

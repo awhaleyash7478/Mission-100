@@ -23,9 +23,9 @@ public class Dashboard {
                         System.out.println(
                                                         "1. Add Money\n" + //
                                                         "2. Send Money\n" + //
-                                                        "3. Pay Merchant\n" + //
-                                                        "4. Request Money\n" + //
-                                                        "5. Payment Requests\n" + //
+                                                        
+                                                        "3. Request Money\n" + //
+                                                        "4. Payment Requests\n" + //
                                                         "6. Transaction History\n" + //
                                 "7. Logout");
                                      int choice=0;
@@ -52,6 +52,15 @@ public class Dashboard {
                                         RequestMoney r=new RequestMoney(conn, sc);
                                         r.requestMoney();
                                         break;
+                                    case 4:
+                                        ApproveRequest a=new ApproveRequest(conn, sc);
+
+                                        a.paymentRequest();
+                                        break;
+                                    case 7:
+                                        return;
+                                        
+
                                 
                                     default:
                                         System.out.println("Invalid choice [allowed is 1-6]");

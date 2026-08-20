@@ -21,7 +21,7 @@ public class NotificationThread extends Thread{
             try 
             {
                 checkNotification();
-                Thread.sleep(3000);
+                Thread.sleep(5000);
             }catch(Exception e)
             {
                 e.printStackTrace();
@@ -73,6 +73,10 @@ public class NotificationThread extends Thread{
 
 
         }
+        String delete="delete from notification where user_name=?";
+    PreparedStatement ds=conn.prepareStatement(delete);
+    ds.setString(1, userName);
+    ds.executeUpdate();
         // System.out.println("Thread ended");
 
         }catch(Exception e)
