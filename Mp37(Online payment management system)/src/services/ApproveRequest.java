@@ -175,6 +175,13 @@ public class ApproveRequest {
                           if(rows>0)
                         {
                             System.out.println("Transaction Done Succesfully");
+                            String notify="insert into notification (notification_type ,user_name)values(?,?)";
+                            int approveid=3;
+                            PreparedStatement notification=conn.prepareStatement(notify);
+                            notification.setInt(1, approveid);
+                            notification.setString(2, sender);
+                            notification.executeUpdate();
+
 
                             String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction,user_name)values(?,?,?,?,?,?,?)";
                             PreparedStatement pr=conn.prepareStatement(history);

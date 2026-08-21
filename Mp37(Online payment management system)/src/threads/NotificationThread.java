@@ -89,6 +89,11 @@ public class NotificationThread extends Thread{
              System.out.println("----------------------------");
 
 
+        }else if(notification_id==3)
+        {
+            System.out.println("-------------------------------------");
+            System.out.println("Your Payment request was approved");
+             System.out.println("-------------------------------------");
         }
         }
        
