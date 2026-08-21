@@ -26,8 +26,8 @@ public class Dashboard {
                                                         
                                                         "3. Request Money\n" + //
                                                         "4. Payment Requests\n" + //
-                                                        "6. Transaction History\n" + //
-                                "7. Logout");
+                                                        "5. Transaction History\n" + //
+                                "6. Logout");
                                      int choice=0;
                                 try
                                 {
@@ -36,6 +36,8 @@ public class Dashboard {
                                 }catch(Exception e)
                                 {
                                     System.out.println("Pls enter the valid input[eg:-1 for Add Money]");
+                                     sc.nextLine();
+                                     
                                 }
                                 switch (choice) {
                                     case 1:
@@ -57,7 +59,11 @@ public class Dashboard {
 
                                         a.viewpaymentRequest();
                                         break;
-                                    case 7:
+                                    case 5:
+                                        PaymentHistory p=new PaymentHistory(conn);
+                                        p.viewHistory();
+                                        break;
+                                    case 6:
                                         return;
                                         
 

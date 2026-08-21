@@ -12,6 +12,7 @@ public class NotificationThread extends Thread{
     {
         this.conn=conn;
     }
+
     Object currDate;
     Object currTime;
     public void run()
@@ -32,6 +33,7 @@ public class NotificationThread extends Thread{
     }
     public void checkNotification()
     {
+           String currUser=CustomerVerification.userName;
         // System.out.println("notification thread started");
         String sender=null,receiver=null;
         int notification_id=0;
@@ -44,7 +46,7 @@ public class NotificationThread extends Thread{
             PreparedStatement preparedStatement=conn.prepareStatement(query);
             preparedStatement.setString(1,userName );
         ResultSet resultSet=preparedStatement.executeQuery();
-        if((resultSet.next()))
+        while((resultSet.next()))
         {
             sender=resultSet.getString("sender");
             
@@ -52,8 +54,7 @@ public class NotificationThread extends Thread{
             notification_id=resultSet.getInt("notification_type");
             currTime=resultSet.getObject("time");
             currDate=resultSet.getObject("date");
-        }
-        if(notification_id==1)
+             if(notification_id==1)
         {
             System.out.println("----------------------------");
             System.out.println("Money received: "+amount);
@@ -61,6 +62,22 @@ public class NotificationThread extends Thread{
             System.out.println("Time: "+currTime);
             System.out.println("Date: "+currDate);
              System.out.println("----------------------------");
+              String history="insert into paymenthistory(amount,sender,receiver,date,time,transaction,user_name)values(?,?,?,?,?,?,?)";
+            String status="Received";
+              
+
+        PreparedStatement his=conn.prepareStatement(history);
+        his.setDouble(1, amount);
+        his.setString(2, sender);
+        his.setString(3,currUser);
+        his.setObject(4, currDate);
+        his.setObject(5, currTime);
+        his.setString(6, status);
+        his.setString(7,currUser);
+
+        his.executeUpdate();
+        
+        
 
         }else if(notification_id==2)  
         {
@@ -73,6 +90,9 @@ public class NotificationThread extends Thread{
 
 
         }
+        }
+       
+       
         String delete="delete from notification where user_name=?";
     PreparedStatement ds=conn.prepareStatement(delete);
     ds.setString(1, userName);

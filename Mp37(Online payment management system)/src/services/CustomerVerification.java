@@ -81,7 +81,9 @@ public class CustomerVerification {
 
                     NotificationThread n=new NotificationThread(conn);
                     
+                    n.setDaemon(true);
                     n.start();
+                    
                     
                     dasObj.viewDashboard();
                    
@@ -384,7 +386,7 @@ else if(flag==0)
                register();
                break; 
             case 3:
-               return ; 
+               return; 
             default:
                 System.out.println("Invalid entry");
                 break;

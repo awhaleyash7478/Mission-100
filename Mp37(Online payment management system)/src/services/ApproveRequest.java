@@ -20,6 +20,7 @@ public class ApproveRequest {
     String sender;
     Object date,time;
     String currUser=CustomerVerification.userName;
+    int requestid;
     public void viewpaymentRequest()
     {
        
@@ -29,12 +30,19 @@ public class ApproveRequest {
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1, currUser);
             ResultSet rs=ps.executeQuery();
-            if(rs.next())
+         int found=0;
+
+         
+            while(rs.next())
             {
+                
+                found=1;
                 amount=rs.getDouble("amount");
                 sender=rs.getString("sender");
                 date=rs.getObject("date");
                 time=rs.getObject("time");
+                requestid=rs.getInt("requestid");
+              
             System.out.println("-----------------------------");
             System.out.println("Money Requested: "+amount);
             System.out.println("From: "+sender);
@@ -46,6 +54,12 @@ public class ApproveRequest {
 
 
             }
+            if(found==0)
+            {
+                System.out.println("No Payment Request");
+                return;
+            }
+            
 
 
         }catch(Exception e)
@@ -62,7 +76,7 @@ public class ApproveRequest {
  
         try 
         {
-            System.out.println("1.Approve      2.Reject       3.Exit");
+            System.out.println("1.Approve      2.Reject       3.Skip      4.Exit");
             choice=sc.nextInt();
             sc.nextLine();
         }catch(Exception e)
@@ -157,11 +171,12 @@ public class ApproveRequest {
                         int rows=p.executeUpdate();
                         LocalDate currDate=LocalDate.now();
                         LocalTime currtime=LocalTime.now();
-                        String transaction="Money Request";
+                        String transaction="Money Request(A)";
                           if(rows>0)
                         {
                             System.out.println("Transaction Done Succesfully");
-                            String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction)values(?,?,?,?,?,?)";
+
+                            String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction,user_name)values(?,?,?,?,?,?,?)";
                             PreparedStatement pr=conn.prepareStatement(history);
                             pr.setDouble(1, amount);
                             pr.setString(2,currUser );
@@ -169,13 +184,16 @@ public class ApproveRequest {
                             pr.setObject(4, currDate);
                             pr.setObject(5, currtime);
                             pr.setString(6, transaction);
+                            pr.setString(7,currUser);
                             pr.executeUpdate();
                             
-                                String query="delete from paymentrequest where sender=? and user_name=?";
+                                String query="delete from paymentrequest where requestid=?";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setString(1, sender);
-            ps.setString(2, currUser);
+            ps.setInt(1, requestid);
+            
             ps.executeUpdate();
+           
+            break;
            
 
                             
@@ -184,6 +202,7 @@ public class ApproveRequest {
                         }else 
                         {
                             System.out.println("Transaction Failed");
+                            break;
                           
                         }
 
@@ -195,14 +214,13 @@ public class ApproveRequest {
         }else if(choice==2)
         {
             try {
-                String query="delete from paymentrequest where sender=? and user_name=?";
+                String query="delete from paymentrequest where requestid=?";
             PreparedStatement ps=conn.prepareStatement(query);
-            ps.setString(1, sender);
-            ps.setString(2, currUser);
+            ps.setInt(1, requestid);
             int rows=ps.executeUpdate();
             if(rows>0)
             {
-                System.out.println("Payment Request deleted successfully");
+                System.out.println("Payment Request Rejected successfully");
                 return;
             }else 
             {
@@ -214,7 +232,13 @@ public class ApproveRequest {
                e.printStackTrace();
             }
 
-        }else if(choice==3) 
+        }
+        else if(choice==3)
+        {
+            System.out.println("breaking it");
+            break;
+
+        }else if(choice==4) 
         {
             
             return;

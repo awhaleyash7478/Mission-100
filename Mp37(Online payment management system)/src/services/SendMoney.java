@@ -237,7 +237,7 @@ a=new AttemptValidationThread();
                         if(rows>0)
                         {
                             System.out.println("Transaction Done Succesfully");
-                            String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction)values(?,?,?,?,?,?)";
+                            String history="insert into paymenthistory (amount,sender,receiver,date,time,transaction,user_name)values(?,?,?,?,?,?,?)";
                             PreparedStatement pr=conn.prepareStatement(history);
                             pr.setDouble(1, amount);
                             pr.setString(2,currUser );
@@ -245,6 +245,7 @@ a=new AttemptValidationThread();
                             pr.setObject(4, currDate);
                             pr.setObject(5, currtime);
                             pr.setString(6, transaction);
+                            pr.setString(7,currUser);
                             pr.executeUpdate();
                                   
 

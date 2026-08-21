@@ -164,7 +164,16 @@ public class RequestMoney {
                     }
                     
                 
+                }else if(choice==2)
+                {
+                    break;
+                }else 
+                {
+                    System.out.println("Invalid choice allowed is 1-2");
+                    sc.nextLine();
+                    continue;
                 }
+                
             }
         }catch(Exception e)
                 {
