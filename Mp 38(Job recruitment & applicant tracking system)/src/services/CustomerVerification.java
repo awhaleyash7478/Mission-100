@@ -236,6 +236,26 @@ if (!mobNo.matches("[7-9][0-9]{9}")) {
 }
 break;
             }
+        while(true)
+        {
+            String email=null;
+
+
+            System.out.println("Enter the email id:");
+            email=sc.nextLine();
+            String regex="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            if(email.matches(regex))
+            {
+                break;
+            }else 
+            {
+                System.out.println("Invalid email id");
+                continue;
+            }
+                                
+
+            
+        }
 while (true) {
     
 System.out.println("Enter the address:");
