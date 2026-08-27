@@ -19,14 +19,16 @@ public class CustomerVerification {
     Connection conn;
    
     public int otpgenerated;
+    ProfileMaker proObj;
 
    
    public CustomerVerification(Scanner sc,Connection conn)
        {
+     
            
            this.sc=sc;
            this.conn=conn;
-                  
+                     proObj=new ProfileMaker(conn, sc);
         
          
     }
@@ -78,11 +80,15 @@ public class CustomerVerification {
                         found=1;
                     
                     System.out.println("Login Successfull");
+                    proObj.menu();
+                    
 
                     NotificationThread n=new NotificationThread(conn);
                     
+                    
                     n.setDaemon(true);
                     n.start();
+                    
                     
                     
                  
@@ -339,6 +345,8 @@ if(OTP==otpgenerated)
 {
     flag=1;
     System.out.println("Account registered Successfully");
+    proObj.menu();
+    
     
 
 
