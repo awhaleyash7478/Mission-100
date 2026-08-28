@@ -1,6 +1,7 @@
 package services;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Scanner;
 
 public class ProfileMaker {
@@ -11,13 +12,14 @@ public class ProfileMaker {
         this.conn=conn;
         this.sc=sc;
     }
-    public void createProfile()
-    {
-        String name,address,email,institue,qualification,role,mobNo,experience,company;
+     String name,address,email,institue,qualification,role,mobNo,experience,company;
         int passYear=0,exYear=0;
         double percentage=0.0;
 
         String skills=null;
+    public void createProfile()
+    {
+       
        System.out.println("-----Personal Information-----");
        System.out.print("Name: ");
        name=sc.nextLine();
@@ -104,7 +106,7 @@ break;    }
         }
         if(choice==1)
         {
-            //generate the profile
+            genereateProfile();
         }else if(choice==2)
         {
             //make changes
@@ -112,7 +114,39 @@ break;    }
         {
             return;
         }
+   
     }                                  
+    }
+    public void genereateProfile()
+    {
+        try {
+            String query="insert into applicant_profile (username,email,mob_no,location,qualification,institute,passingYear,percentage,skills,experience,company,role)";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1,name);
+            ps.setString(2, email);
+            ps.setString(3, mobNo);
+            ps.setString(4, address);
+            ps.setString(5, qualification);
+            ps.setString(6, institue);
+            ps.setInt(7, passYear);
+            ps.setDouble(8, percentage);
+            ps.setString(9, skills);
+            ps.setString(10, experience);
+            ps.setString(11, company);
+            ps.setString(12, role);
+            int rows=ps.executeUpdate();
+            if(rows>0)
+            {
+                System.out.println("Profile Generated Successfully");
+
+            }else 
+            {
+                System.out.println("Unable to Generate the Profile");
+                return;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
     public void menu()
     {
