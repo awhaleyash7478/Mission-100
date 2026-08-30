@@ -241,20 +241,49 @@ break;
     {
         String column=null;
         String field=null;
+        try {
+            String query="select * from applicant_profile where registername=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, CustomerVerification.userName);
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                name=rs.getString("username");
+                email=rs.getString("email");
+                mobNo=rs.getString("mob_no");
+                address=rs.getString("location");
+                qualification=rs.getString("qualification");
+                institue=rs.getString("institute");
+                passYear=rs.getInt("passingYear");
+                percentage=rs.getDouble("percentage");
+                experience=rs.getString("experience");
+                company=rs.getString("company");
+                role=rs.getString("role");
+                exYear=rs.getInt("years");
+
+                
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
         while (true) {
             
-        
+         System.out.println("------------------------------------------------------------------------");
         System.out.println("{Note:Enter the Number to update the field[for eg:1 for Name]}");
+        System.out.println("------------------------------------------------------------------------");
         System.out.println("1.Name     2.Email     3.MobNo     4.Location     5.Qualification");
+        System.out.println("------------------------------------------------------------------------");
         System.out.println("6.Institute     7.Passing Year     8.Percentage/CGPA");
+         System.out.println("------------------------------------------------------------------------");
         System.out.println("9.Experience     10.Company     11.Role     12.Years     13.Exit");
-        
+         System.out.println("------------------------------------------------------------------------");
    int choice=0;
    System.out.println("Enter the choice: ");
    try 
    {
     choice=sc.nextInt();
+    sc.nextLine();
    }catch(Exception e)
    {
     System.out.println("{Note:Enter the Number to column the field[for eg:1 for Name]}");
@@ -262,6 +291,7 @@ break;
     continue;
     
    }
+
    switch (choice) {
     case 1:
         System.out.println(" Old Name: "+name);
@@ -396,10 +426,39 @@ break;
 
         break;
     case 9:
+        int ch=0;
         column="experience";
+        while (true) {
+        
+        
         System.out.println("Old Profile: "+experience);
-        System.out.println("New Profile: ");
-        experience=sc.nextLine();
+
+        System.out.println("1.Experienced      2.Fresher");
+        try 
+        {
+            ch=sc.nextInt();
+        }catch(Exception e)
+        {
+            System.out.println("Pls enter the valid option[Eg 1 for Experienced]");
+            sc.nextLine();
+            continue;
+        }
+       if(ch==1)
+       {
+        experience="experienced";
+       }else if(ch==2)
+       {
+        experience="Fresher";
+       }else 
+       {
+        System.out.println("Invalid option selected allowed is 1 and 2");
+        sc.nextLine();
+        continue;
+       }
+
+        
+        break;
+    }
         field=experience;
 
         break;
@@ -460,6 +519,7 @@ try {
      {
       
         System.out.println(column+" updated successfully");
+      
     
     }else 
      {
@@ -538,7 +598,7 @@ try {
            e.printStackTrace();
         }
     }
-    public void menu()
+    public void mainMenu()
     {
         int ch=0;
         while (true) {
@@ -557,7 +617,7 @@ try {
         }
         if(ch==1)
         {
-          createProfile();
+     createProfile();
         }else if(ch==2)
         {
             return;
@@ -568,6 +628,44 @@ try {
             continue;
         }
     }
+}
+public void subMenu()
+{
+    int choice=0;
+    while (true) {
+        
+    
+
+    System.out.println("1.Update Profile         2.View Profile         3.Exit");
+
+    try 
+    {
+        choice=sc.nextInt();
+    }catch(Exception e)
+    {
+        System.out.println("Pls enter the valid option[eg:3 for Exit]");
+        sc.nextLine();
+        continue;
+    }
+    break;
+    
+}
+    switch (choice) {
+        case 1:
+            updateProfile();
+            
+            break;
+        case 2:
+            //viewProfile
+            break;
+        case 3:
+            return;
+    
+        default:
+            break;
+    }
+
+    
 }
     
 }

@@ -80,7 +80,24 @@ public class CustomerVerification {
                         found=1;
                     
                     System.out.println("Login Successfull");
-                    proObj.menu();
+                    try {
+                        String validate="select username from applicant_profile where registername=?";
+                        PreparedStatement preparedStatement=conn.prepareStatement(validate);
+                        preparedStatement.setString(1, userName);
+                        ResultSet resultSet=preparedStatement.executeQuery();
+                        if(resultSet.next())
+                        {
+                            proObj.subMenu();
+                        }else 
+                        {
+                             proObj.mainMenu();
+                  
+        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                 
                     
 
                     NotificationThread n=new NotificationThread(conn);
@@ -345,7 +362,7 @@ if(OTP==otpgenerated)
 {
     flag=1;
     System.out.println("Account registered Successfully");
-    proObj.menu();
+    proObj.mainMenu();
     
     
 
