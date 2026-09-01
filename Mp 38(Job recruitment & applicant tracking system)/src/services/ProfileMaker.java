@@ -237,6 +237,57 @@ break;
    
     }                                  
     }
+    public void viewProfile()
+    {
+          try {
+            String query="select * from applicant_profile where registername=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, CustomerVerification.userName);
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                name=rs.getString("username");
+                email=rs.getString("email");
+                mobNo=rs.getString("mob_no");
+                address=rs.getString("location");
+                qualification=rs.getString("qualification");
+                institue=rs.getString("institute");
+                passYear=rs.getInt("passingYear");
+                percentage=rs.getDouble("percentage");
+                experience=rs.getString("experience");
+                company=rs.getString("company");
+                role=rs.getString("role");
+                exYear=rs.getInt("years");
+                  System.out.println("==========================================");
+    System.out.println("           APPLICANT PROFILE");
+    System.out.println("==========================================");
+
+    System.out.println("\n--- Personal Information ---");
+    System.out.println("Name       : " + name);
+    System.out.println("Email      : " + email);
+    System.out.println("Mobile No  : " + mobNo);
+    System.out.println("Address    : " + address);
+
+    System.out.println("\n--- Education ---");
+    System.out.println("Qualification : " + qualification);
+    System.out.println("Institute     : " + institue);
+    System.out.println("Passing Year  : " + passYear);
+    System.out.println("Percentage    : " + percentage + "%");
+
+    System.out.println("\n--- Experience ---");
+    System.out.println("Experience    : " + experience);
+    System.out.println("Company      : " + company);
+    System.out.println("Role         : " + role);
+    System.out.println("Years        : " + exYear);
+
+    System.out.println("==========================================");
+
+                
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void updateProfile()
     {
         String column=null;
@@ -506,9 +557,9 @@ field=String.valueOf(exYear);
         System.out.println("Pls enter the valid option Only[1-12]");
         break;
     }
-    System.out.println("Hey out from Switch");
+    
 try {
-    System.out.println("hey the column is:"+column);
+   
         String query="update applicant_profile set "+column+"= ? where registername=?";
 
     PreparedStatement preparedStatement=conn.prepareStatement(query);
@@ -527,22 +578,7 @@ try {
      }
 } catch (Exception e) {
     e.printStackTrace();
-}
-
-   
-    
-
-   
-    
-
-        
-
-
-        
-        
-        
-
-       
+}    
     
 }
 }
@@ -656,7 +692,7 @@ public void subMenu()
             
             break;
         case 2:
-            //viewProfile
+            viewProfile();
             break;
         case 3:
             return;
