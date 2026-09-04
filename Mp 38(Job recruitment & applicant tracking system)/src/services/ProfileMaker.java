@@ -257,7 +257,10 @@ break;
                 company=rs.getString("company");
                 role=rs.getString("role");
                 exYear=rs.getInt("years");
-                  System.out.println("==========================================");
+
+                
+            }
+                              System.out.println("==========================================");
     System.out.println("           APPLICANT PROFILE");
     System.out.println("==========================================");
 
@@ -280,9 +283,38 @@ break;
     System.out.println("Years        : " + exYear);
 
     System.out.println("==========================================");
+    while(true)
+    {
+    System.out.println("1.Update Profile            2.Exit");
+    int ch=0;
+    try
+    {
+        ch=sc.nextInt();
+        sc.nextLine();
+    }catch(Exception e)
+    {
+        System.out.println("Pls enter the valid option[eg: 2 for Exit]");
+        continue;
 
-                
-            }
+    }
+    if(ch==1)
+    {
+       
+        updateProfile();
+
+        
+    }else if(ch==2)
+    {
+break;
+    }else 
+    {
+        System.out.println("Invalid option allowed is 1 and 2");
+        sc.nextLine();
+        continue;
+    }
+  
+}
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -672,11 +704,12 @@ public void subMenu()
         
     
 
-    System.out.println("1.Update Profile         2.View Profile         3.Exit");
+    System.out.println("1.My Profile        2.Search Jobs        3.Recommended Jobs");
 
     try 
     {
         choice=sc.nextInt();
+        sc.nextLine();
     }catch(Exception e)
     {
         System.out.println("Pls enter the valid option[eg:3 for Exit]");
@@ -687,19 +720,20 @@ public void subMenu()
     
 }
     switch (choice) {
+  
         case 1:
-            updateProfile();
             
-            break;
-        case 2:
             viewProfile();
             break;
-        case 3:
-            return;
+        case 2:
+            JobApplication jobObj=new JobApplication(conn, sc);
+            jobObj.searchJobs();
+            break;
     
         default:
             break;
     }
+    
 
     
 }
