@@ -716,9 +716,9 @@ public void subMenu()
         sc.nextLine();
         continue;
     }
-    break;
+ 
     
-}
+
     switch (choice) {
   
         case 1:
@@ -734,8 +734,9 @@ public void subMenu()
             break;
     }
     
-
+    }
     
 }
+
     
 }

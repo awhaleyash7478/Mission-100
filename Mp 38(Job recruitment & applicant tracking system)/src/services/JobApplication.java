@@ -1,6 +1,8 @@
 package services;
 import java.util.*;
+import java.util.concurrent.RecursiveTask;
 import java.sql.*;
+import java.sql.Date;
 
 public class JobApplication {
     Connection conn;
@@ -10,29 +12,48 @@ public class JobApplication {
         this.conn=conn;
         this.sc=sc;
     }
+    
     public void searchJobs()
     {
         String jobTitle=null;
         String location=null;
         
-        // System.out.println("Enter the Job title: ");
-        // jobTitle=sc.nextLine();
-        // System.out.println("Enter the Location: ");
-        // location=sc.nextLine();
+         System.out.println("Enter the Job title: ");
+         jobTitle=sc.nextLine().toLowerCase();
+        System.out.println("Enter the Location: ");
+         location=sc.nextLine().toLowerCase();
+         
+        int found=0;
            
-        LinkedHashMap <String,String>h=new LinkedHashMap<>();
+     
 
         try {
-         String query="select *from jobs";
-         PreparedStatement ps=conn.prepareStatement(query);
+         String query="select *from jobs where position like ? and location like ?";
          
+
+         
+         PreparedStatement ps=conn.prepareStatement(query);
+         ps.setString(1, "%"+jobTitle+"%");
+         ps.setString(2, location+"%");
+
          ResultSet rs=ps.executeQuery();
+         System.out.printf("%-10s %-30s %-30s %-30s%n",
+        "Job ID", "Position", "Company", "Location");
+
+System.out.println("-------------------------------------------------------------------------------------");
+
      
          while (rs.next()) {
+            found=1;
+            
            
-            String positions=rs.getString("position");
-            String locations=rs.getString("location");
-            h.put(positions, locations);
+            System.out.printf("%-10d %-30s %-30s %-30s%n",
+        rs.getInt("job_id"),
+        rs.getString("position"),
+        rs.getString("company"),
+        rs.getString("location"));
+
+
           
 
             
@@ -40,59 +61,97 @@ public class JobApplication {
             
             
          }
-          String ss=null;
-        //   System.out.println(h.entrySet());
-         // System.out.print(entry.getKey());
-            // System.out.print("        ");
-            // System.out.print(entry.getValue());
-            // System.out.println();
-            //                
-            // entry.getKey(),
-            jobTitle="java";
+         System.out.println("-------------------------------------------------------------------------------------");
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
-  for(String s:h.keySet())
-  {
-    if(s.toLowerCase().contains(jobTitle.toLowerCase()))
-    {
-        System.out.println("hi");
-        System.out.println("key: "+s);
-       System.out.println("value: "+h.get(s)); 
-      
+         
+         if(found==0)
+         { System.out.println();
+            System.out.println("-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-");
+            System.out.println("No Such Jobs or not in given Location");
+            System.out.println("-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-");
+            System.out.println();
+            System.out.println("-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-");
+            System.out.println("Other Similar Job matches");
+           System.out.println("-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-");
+            try {
+                  String query2="select *from jobs where position like ?";
+         
 
-    }
-  }
-        
-        // for(String key:h.keySet())
-        // {
-        //     System.out.println(key);
-        //     // for(String value:h.values())
-        //     // {
-        //     //     System.out.println(value);
-        //     //     break;
-        //     // }
-        // }
-        //  for(String s:h.keySet())
-        //  {
-        //     System.out.print("\n"+s);
+         
+         PreparedStatement pp=conn.prepareStatement(query2);
+         pp.setString(1, "%"+jobTitle+"%");
+ 
+
+         ResultSet rr=pp.executeQuery();
+         System.out.printf("%-10s %-30s %-30s %-30s%n",
+        "Job ID", "Position", "Company", "Location");
+
+System.out.println("-------------------------------------------------------------------------------------");
+            
+
+    
+     
+         while (rr.next()) {
+            found=1;
+            
            
-        //           for(String sss:h.values())
-        //  {
+            System.out.printf("%-10d %-30s %-30s %-30s%n",
+        rr.getInt("job_id"),
+        rr.getString("position"),
+        rr.getString("company"),
+        rr.getString("location"));
 
-        //     System.out.println(" ss: "+ss);
-        //     ss=sss;
-        //     System.out.println("sss: "+sss);
-      
+
           
-        //     break;
-            
-        //  }
-        //    h.values().remove(ss);
-            
+
             
 
-        //  }
-        //  System.out.print("    ");
+            
+            
+         }
+         System.out.println("-------------------------------------------------------------------------------------");
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    while (true) {
+        
+    
+         System.out.println("1.View Job Details        2.Exit");
+         int choice=0;
       
+            
+         
+         try 
+         {
+            choice=sc.nextInt();
+            sc.nextLine();
+         }catch(Exception e)
+         {
+            System.out.println("Pls enter the valid choice[For eg:2 for Exit]");
+            sc.nextLine();
+            continue;
+         }
+        
+        switch (choice) {
+            case 1:
+                viewJobDetails();
+                
+                break;
+            case 2:
+                return ;
+        
+            default:
+                System.out.println("Invalid Choice pls enter the valid choice");
+                break;
+        }
+    }
+     
       
         
        
@@ -102,11 +161,161 @@ public class JobApplication {
 
        
         
-        } catch (Exception e) {
-         e.printStackTrace();
-        }
+        
+    
 
          
-    }
+    
+    
+
     
 }
+public  void viewJobDetails()
+{
+    int tempjobId=0;
+    while (true) {
+        
+    
+    System.out.println("Enter the Job Id: ");
+    try 
+    {
+        tempjobId=sc.nextInt();
+    }catch(Exception e)
+    {
+        System.out.println("Pls enter the valid Job id");
+        sc.nextLine();
+    continue;
+    }
+    break;
+}
+String position=null,company=null,location=null,experience=null,employment=null,salary=null,requiredSkills=null,description=null;
+Date postedOn=null,applicationDeadline=null;
+int openings=0;
+try {
+    String query ="select * from jobs where job_id=?";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setInt(1, tempjobId);
+    ResultSet rs=ps.executeQuery();
+    int jobId=0;
+    if(rs.next())
+    {
+        jobId = rs.getInt("job_id");
+    position = rs.getString("position");
+    company = rs.getString("company");
+    location = rs.getString("location");
+    experience = rs.getString("experience");
+    employment = rs.getString("employment");
+    salary = rs.getString("salary");
+    requiredSkills = rs.getString("required_skills");
+    description = rs.getString("description");
+    postedOn = rs.getDate("posted_on");
+    applicationDeadline = rs.getDate("application_deadline");
+    openings = rs.getInt("openings");
+    }
+    System.out.println("\n========== JOB DETAILS ==========");
+System.out.println("Job ID              : " + jobId);
+System.out.println("Position            : " + position);
+System.out.println("Company             : " + company);
+System.out.println("Location            : " + location);
+System.out.println("Experience          : " + experience);
+System.out.println("Employment          : " + employment);
+System.out.println("Salary              : " + salary);
+System.out.println("Required Skills     : " + requiredSkills);
+System.out.println("Description         : " + description);
+System.out.println("Posted On           : " + postedOn);
+System.out.println("Application Deadline: " + applicationDeadline);
+System.out.println("Openings            : " + openings);
+System.out.println("================================");
+} catch (Exception e) {
+e.printStackTrace();
+}
+while(true)
+{
+System.out.println("\n1.Apply      2.Save      3.Exit");
+int choice=0;
+
+try{
+    choice=sc.nextInt();
+}catch(Exception e)
+{
+    System.out.println("Pls enter the valid option[Eg:1 for Apply]");
+    sc.nextLine();
+    continue;
+}
+
+
+switch (choice) {
+    case 1:
+     applyJob(tempjobId);
+        
+        break;
+    case 2:
+        saveJob(tempjobId);
+    case 3:
+        return ;
+
+    default:
+        System.out.println("Invalid entry ");
+        break;
+}
+}
+
+
+
+}
+public void applyJob(int tempjobId)
+{
+    int jobId=tempjobId;
+   
+     try 
+{
+    String query="insert into applyJob(job_id,username)values(?,?)";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setInt(1, jobId);
+    ps.setString(2, CustomerVerification.userName);
+  int rows=  ps.executeUpdate();
+  if(rows>0)
+  {
+    System.out.println("Applied for Job successfully");
+    
+  }else 
+  {
+    System.out.println("Unable to apply for Job");
+  }
+
+}catch(Exception e)
+{
+    e.printStackTrace();
+}
+    
+
+
+}
+public void saveJob(int tempjobId)
+{
+     int jobId=tempjobId;
+   
+     try 
+{
+    String query="insert into saveJob(job_id,username)values(?,?)";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setInt(1, jobId);
+    ps.setString(2, CustomerVerification.userName);
+  int rows=  ps.executeUpdate();
+  if(rows>0)
+  {
+    System.out.println("Job  Saved successfully");
+    
+  }else 
+  {
+    System.out.println("Unable to Save Job");
+  }
+
+}catch(Exception e)
+{
+    e.printStackTrace();
+}
+}
+}
+
+    
