@@ -100,11 +100,8 @@ public class CustomerVerification {
                  
                     
 
-                    NotificationThread n=new NotificationThread(conn);
                     
-                    
-                    n.setDaemon(true);
-                    n.start();
+                
                     
                     
                     
@@ -321,6 +318,23 @@ System.out.println("Enter the address:");
                 generateOtp();
             
            }
+             try {
+                        String validate="select username from applicant_profile where registername=?";
+                        PreparedStatement preparedStatement=conn.prepareStatement(validate);
+                        preparedStatement.setString(1, userName);
+                        ResultSet resultSet=preparedStatement.executeQuery();
+                        if(resultSet.next())
+                        {
+                            proObj.subMenu();
+                        }else 
+                        {
+                             proObj.mainMenu();
+                  
+        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
             
         } catch (SQLException e) {
             e.printStackTrace();

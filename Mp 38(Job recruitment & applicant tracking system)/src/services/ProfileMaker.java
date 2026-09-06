@@ -8,19 +8,37 @@ import java.util.Scanner;
 public class ProfileMaker {
     Connection conn;
     Scanner sc;
+    JobApplication jobObj;
     public ProfileMaker(Connection conn,Scanner sc)
     {
         this.conn=conn;
         this.sc=sc;
+        jobObj=new JobApplication(conn, sc);
     }
      String name,address,email,institue,qualification,role,mobNo,experience,company;
         int passYear=0,exYear=0;
         double percentage=0.0;
+   
    String skill;
         ArrayList <String>skills =new ArrayList<String>();
               int applicant_no=0;
         public void createProfile()
     {
+        try {
+            String validate="select username from applicant_profile where registername=?";
+        PreparedStatement preparedStatement=conn.prepareStatement(validate);
+        preparedStatement.setString(1, CustomerVerification.userName);
+        ResultSet resultSet=preparedStatement.executeQuery();
+        if(resultSet.next())
+        {
+            System.out.println("Profile Already Exist");
+            return ;
+            
+        }
+        } catch (Exception e) {
+     e.printStackTrace();
+        }
+
 
        
        System.out.println("-----Personal Information-----");
@@ -174,6 +192,7 @@ break;
         try 
         {
         choice=sc.nextInt();
+        sc.nextLine();
         }catch(Exception e)
         {
             System.out.println("Invalid input pls enter the option no. only");
@@ -325,11 +344,13 @@ break;
         String column=null;
         String field=null;
         try {
+            int found=0;
             String query="select * from applicant_profile where registername=?";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1, CustomerVerification.userName);
             ResultSet rs=ps.executeQuery();
-            while (rs.next()) {
+            while(rs.next()) {
+                found=1;
                 name=rs.getString("username");
                 email=rs.getString("email");
                 mobNo=rs.getString("mob_no");
@@ -344,6 +365,11 @@ break;
                 exYear=rs.getInt("years");
 
                 
+            }
+            if(found==0)
+            {
+                System.out.println("Pls Generate the Profile First");
+                return ;
             }
 
         } catch (Exception e) {
@@ -616,6 +642,21 @@ try {
 }
     public void genereateProfile()
     {
+         try {
+            String validate="select username from applicant_profile where registername=?";
+        PreparedStatement preparedStatement=conn.prepareStatement(validate);
+        preparedStatement.setString(1, CustomerVerification.userName);
+        ResultSet resultSet=preparedStatement.executeQuery();
+        if(resultSet.next())
+        {
+            System.out.println("Profile Already Exist");
+            return ;
+            
+        }
+        } catch (Exception e) {
+     e.printStackTrace();
+        }
+
         try {
             String query="insert into applicant_profile (username,email,mob_no,location,qualification,institute,passingYear,percentage,experience,company,role,years,registername)values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps=conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -633,17 +674,16 @@ try {
             ps.setString(11, role);
             ps.setInt(12, exYear);
             ps.setString(13,CustomerVerification.userName);
-            System.out.println("username: "+CustomerVerification.userName);
+            
          ps.executeUpdate();
             ResultSet rr=ps.getGeneratedKeys();
             if(rr.next())
                 applicant_no=rr.getInt(1);
             int rows= 0;
-            System.out.println("applicant no: "+applicant_no);
+
             for(String nums:skills)
             {
-                  System.out.println("nums: "+nums);
-                  System.out.println("----------");
+                 
             String insert="insert into applicant_skills (applicant_no ,skills)values(?,?)";
             PreparedStatement pp=conn.prepareStatement(insert);
             pp.setInt(1, applicant_no);
@@ -656,6 +696,7 @@ try {
             if(rows>0)
             {
                 System.out.println("Profile Generated Successfully");
+                
 
             }else 
             {
@@ -704,7 +745,7 @@ public void subMenu()
         
     
 
-    System.out.println("1.My Profile        2.Search Jobs        3.Recommended Jobs");
+    System.out.println("1.My Profile        2.Search Jobs        3.More Options");
 
     try 
     {
@@ -726,9 +767,62 @@ public void subMenu()
             viewProfile();
             break;
         case 2:
-            JobApplication jobObj=new JobApplication(conn, sc);
+            
             jobObj.searchJobs();
             break;
+        case 3:
+            int ch=0;
+            while (true) {
+                
+            
+            System.out.println("1.Saved Jobs       2.Applied Jobs      3.Logout       4.Exit");
+            try {
+                ch=sc.nextInt();
+                sc.nextLine();
+                
+            } catch (Exception e) {
+                System.out.println("Pls enter the valid option [eg: 2 for History]");
+                sc.nextLine();
+                continue;
+            }
+            switch (ch) {
+                case 1:
+                  jobObj.viewSavedJobs();
+                    break;
+                case 2:
+                    jobObj.viewAppliedJobs();
+                    break;
+                case 3:
+                    String pass=null;
+                 
+                        System.out.println("Enter the Password: ");
+                        
+                            pass=sc.nextLine();
+                            if(pass.equals(CustomerVerification.password))
+                            {
+                                return ;
+                            }else 
+                            {
+                                System.out.println("Invalid Password");
+                            break;
+                            }
+                    case 4:
+
+                        break;
+                        
+                      
+                        
+                    
+
+
+
+            
+                default:
+                    System.out.println("invalid entry");
+                    break;
+            }
+            break;
+        }
     
         default:
             break;
