@@ -1,5 +1,6 @@
 package services;
 
+import java.lang.classfile.instruction.ArrayLoadInstruction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import threads.*;
 
 public class CustomerVerification {
     Scanner sc;
+    
     
 
     Connection conn;
@@ -106,7 +108,8 @@ public class CustomerVerification {
                             login();
                         }else if(subChoice==2)
                         {
-                            register();
+                          
+                           register();
                         }else if(subChoice==3)
                         {
                             return;
@@ -127,13 +130,17 @@ public class CustomerVerification {
     }
    public  void register()
     {
-        
+       
+        ArrayList <String> fetchedMobNo=new ArrayList<>();
+          ArrayList<String>fetchedEmailId=new ArrayList<>();
         
           try 
         {
             int found=0;
+          
             while (true) {
                      ArrayList<String> storedUserName=new ArrayList<>();
+                   
                    
                 found=0;
             
@@ -141,12 +148,14 @@ public class CustomerVerification {
             System.out.println("Enter the UserName:");
             userName=sc.nextLine();
           
-            String fetch="select user_name from register";
+            String fetch="select * from register";
             PreparedStatement pp=conn.prepareStatement(fetch);
             ResultSet rr=pp.executeQuery();
            
             while (rr.next()) {
                  storedUserName.add(rr.getString("user_name"));
+                 fetchedMobNo.add(rr.getString("mob_no"));
+                 fetchedEmailId.add(rr.getString("email_id"));
                       
                 
             }
@@ -235,17 +244,27 @@ public class CustomerVerification {
            System.out.println("Enter the mobile number:");
             mobNo = sc.next();
             sc.nextLine();
+            if(fetchedMobNo.contains(mobNo))
+            {
+               
+                System.out.println("This Number is already registered");
+                
+                continue;
+
+            }
 
 if (!mobNo.matches("[7-9][0-9]{9}")) {
     
     System.out.println("Invalid mobile number");
     continue;
 }
+generateOtp();
 break;
             }
+             String email=null;
         while(true)
         {
-            String email=null;
+           
 
 
             System.out.println("Enter the email id:");
@@ -253,8 +272,18 @@ break;
             String regex="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
             if(email.matches(regex))
             {
-                break;
-            }else 
+                System.out.println(fetchedEmailId);
+
+                if(fetchedEmailId.contains(email))
+            {
+               
+                System.out.println("This email is already registered");
+                continue;
+
+            }
+            break;
+            } 
+            else
             {
                 System.out.println("Invalid email id");
                 continue;
@@ -289,20 +318,23 @@ System.out.println("Enter the address:");
             return;
            }else 
            {
-                String query="insert into register(user_name,mob_no,password)values(?,?,?)";
+                String query="insert into register(user_name,mob_no,password,address,email_id)values(?,?,?,?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1, userName);
             ps.setString(2, mobNo);
             
+            
             ps.setString(3, password);
+            ps.setString(4,address);
+            ps.setString(5, email);
             int rows=ps.executeUpdate();
-            if(rows<0)
+            if(rows>0)
                 {
-                    System.out.println("Unable to register");
+                    System.out.println("Account registered Successfully");
                     return;
 
                 } 
-                generateOtp();
+     
             
            }
             
@@ -339,11 +371,12 @@ while(true)
 {
 System.out.println("Enter the otp:");
 OTP=sc.nextInt();
+sc.nextLine();
 int flag=0;
 if(OTP==otpgenerated)
 {
     flag=1;
-    System.out.println("Account registered Successfully");
+
    
     
     
@@ -410,6 +443,8 @@ else if(flag==0)
              break;   
                 
             case 2:
+                 RolesAllocation roleObj=new RolesAllocation(sc, conn);
+                           roleObj.allocateRoles();
                register();
                break; 
             case 3:
