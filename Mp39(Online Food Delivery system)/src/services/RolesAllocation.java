@@ -180,26 +180,110 @@ int count=1;
     }
     public void deliveryPartnerRegistration()
     {
+        
+             ArrayList <String> fetchedMobNo=new ArrayList<>();
+          ArrayList<String>fetchedEmailId=new ArrayList<>();
+          ArrayList<String>vehNo=new ArrayList<>();
             String email=null,name=null,mob=null,vehNum=null,vehicle=null;
             String regex="^[A-Z]{2}[ -]?[0-9]{1,2}[ -]?[A-Z]{1,3}[ -]?[0-9]{4}$";
+            try {
+                String query="select * from delivery_partners";
+                PreparedStatement ps=conn.prepareStatement(query);
+                ResultSet rs=ps.executeQuery();
+                while(rs.next())
+                {
+                    
+                 fetchedMobNo.add(rs.getString("mob_no"));
+                 fetchedEmailId.add(rs.getString("email"));
+                 vehNo.add(rs.getString("veh_no"));
+                
+                      
+
+                }
+
+                
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
                                 
         System.out.println("----------Delivery Partner Registration----------");
         System.out.print("\nName: ");
         name=sc.nextLine();
+          while (true) {
         System.out.println("Mobile no: ");
          mob=sc.nextLine();
+       
+            if(fetchedMobNo.contains(mob))
+            {
+               
+                System.out.println("This Mobile Number is already registered");
+                
+                continue;
+
+            }
+
+if (!mob.matches("[7-9][0-9]{9}")) {
+    
+    System.out.println("Invalid mobile number");
+    continue;
+}
+break;
+            
+         }
+         while(true)
+         {
         System.out.println("Email: ");
         email=sc.nextLine();
-        System.out.println("Vehicle type: ");
-        vehicle=sc.nextLine();
+        
+                    String emailRegex="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            if(email.matches(emailRegex))
+            {
+               
+
+                if(fetchedEmailId.contains(email))
+            {
+               
+                System.out.println("This email is already registered");
+                continue;
+
+            }
+
+        }
+        break;
+
+    }
+
+      
         while(true)
         {
         System.out.println("Vehicle Number: ");
         vehNum=sc.nextLine();
-        if(!vehNum.matches(regex))
+        if(vehNum.matches(regex))
         {
-            continue;
+            if(vehNo.contains(vehNum))
+            {
+                System.out.println("Vehicle with this number is already registered");
+                continue;
+            }
+            break;
         }
+    }
+    try {
+        String query="insert into delivery_partners (name,email,veh_no,)values(?,?,?)";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, name);
+        ps.setString(2, email);
+        ps.setString(3, vehNum);
+        int rows=ps.executeUpdate();
+        if(rows>0)
+        {
+            System.out.println("Delivery Partner registered successfully");
+        }else 
+        {
+            System.out.println("Unable to register the deilvery partner");
+        }
+    } catch (Exception e) {
+    e.printStackTrace();
     }
     
 
