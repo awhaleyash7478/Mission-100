@@ -40,20 +40,35 @@ public class CustomerVerification {
     
         String  mobNo=null;
        static String password=null;
-      public  static String userName;
+      public  static String userName ;
+      static String mob;
         String address=null;
     public void  login()
     {
         try 
         {
-            System.out.println("Enter the UserName:");
-            userName=sc.nextLine();
+            System.out.println("Enter the Mobile No:");
+            mob=sc.nextLine();
             // d.addIncome(userName);
         
          
         
             System.out.println("Enter the password:");
             password=sc.nextLine();
+            
+        try {
+            String query="select role from usersRoles where mob_no=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1,mob );
+            ResultSet rs=ps.executeQuery();
+            if(rs.next())
+            {
+                String role=rs.getString("role");
+                System.out.println("roles: "+role);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         }catch(Exception e)
         {
             System.out.println("Invalid input pls enter the valid input only");
@@ -63,9 +78,10 @@ public class CustomerVerification {
         }
                  int found=0;
              try {
-            String search="select * from register where user_name=? and password=?";
+            String search="select * from register where mob_no=? and password=?";
             PreparedStatement pp=conn.prepareStatement(search);
-            pp.setString(1, userName);
+         
+            pp.setString(1, mob);
             pp.setString(2, password);
             ResultSet rs=pp.executeQuery();
             if(rs.next())
@@ -138,8 +154,7 @@ public class CustomerVerification {
         {
             int found=0;
           
-            while (true) {
-                     ArrayList<String> storedUserName=new ArrayList<>();
+                 
                    
                    
                 found=0;
@@ -153,66 +168,24 @@ public class CustomerVerification {
             ResultSet rr=pp.executeQuery();
            
             while (rr.next()) {
-                 storedUserName.add(rr.getString("user_name"));
+               
                  fetchedMobNo.add(rr.getString("mob_no"));
                  fetchedEmailId.add(rr.getString("email_id"));
                       
                 
             }
+            
              
-            for(String user:storedUserName){
+        
              
+               
+               
+        
+
       
-     
-
-                if(user.equals(userName))
-                {
-                    found=1;
-                    Random ranObj=new Random();
-                    System.out.println("This username is already taken");
-                    //  String randomName[]=new String[5];
-                     int randomNumber=0;
-                     int i;
-                      HashSet<String>  h=null;
-                      String randomName[]=new String[5];
-                     for( i=0;i<5;i++)
-                    {
-                        
-                    randomNumber=ranObj.nextInt(1,100);
-
-                     randomName[i]=userName+randomNumber;
-                     if(storedUserName.contains(randomName[i]))
-                     {
-                        
-                       
-                        
-                        randomName[i]=randomName[i+1];
-                     }
-                                   h=new HashSet<>(Arrays.asList(randomName));
-
-                  
-                    }
-                 
-                    System.out.print("Suggestions: ");
-                    
-                    System.out.println(h);
-                     
-                     System.out.println();
-                  break;
-
-                }
-             
-               
-               
-        }
-
-        if(found==1)
-        continue;
-        else 
-            break;
        
     }
-}catch(Exception e)
+catch(Exception e)
 {
     e.printStackTrace();
 }
@@ -272,7 +245,7 @@ break;
             String regex="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
             if(email.matches(regex))
             {
-                System.out.println(fetchedEmailId);
+              
 
                 if(fetchedEmailId.contains(email))
             {
@@ -306,18 +279,20 @@ System.out.println("Enter the address:");
     break;
 }
 
- try {
-             String search="select * from register where user_name=? and password=?";
-            PreparedStatement pp2=conn.prepareStatement(search);
-            pp2.setString(1, userName);
-            pp2.setString(2, password);
-            ResultSet rs=pp2.executeQuery();
-           if(rs.next())
-           {
-            System.out.println("This account already exists");
-            return;
-           }else 
-           {
+ 
+        //      String search="select * from register where mob=? and password=?";
+        //     PreparedStatement pp2=conn.prepareStatement(search);
+        //     pp2.setString(1, userName);
+        //     pp2.setString(2, password);
+        //     ResultSet rs=pp2.executeQuery();
+        //    if(rs.next())
+        //    {
+        //     System.out.println("This account already exists");
+        //     return;
+        //    }else 
+           
+            try 
+            {
                 String query="insert into register(user_name,mob_no,password,address,email_id)values(?,?,?,?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1, userName);
@@ -327,27 +302,31 @@ System.out.println("Enter the address:");
             ps.setString(3, password);
             ps.setString(4,address);
             ps.setString(5, email);
-            int rows=ps.executeUpdate();
+            ps.executeUpdate();
+            String role="Customer";
+            
+            String roles="insert into usersRoles (role,mob_no)values(?,?)";
+            PreparedStatement preparedStatement=conn.prepareStatement(roles);
+            preparedStatement.setString(1, role);
+            preparedStatement.setString(2, mobNo);
+            int rows=preparedStatement.executeUpdate();
+             
             if(rows>0)
                 {
                     System.out.println("Account registered Successfully");
                     return;
 
                 } 
-     
+            }catch(Exception e)
+            {
+                e.printStackTrace();
+            }
             
-           }
+           
             
        
             
-        }
-        catch(Exception e)
-        {
-            System.out.println("Invalid input pls enter the valid input only");
-            sc.nextLine();
-            menu();
-
-        }
+     
        
  
 }

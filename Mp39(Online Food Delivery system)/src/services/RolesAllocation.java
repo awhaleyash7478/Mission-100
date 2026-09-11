@@ -167,7 +167,15 @@ int count=1;
             ps.setString(4, mob);
             ps.setString(5, add);
             ps.setString(6, pass);
-       int rows= ps.executeUpdate();
+       ps.executeUpdate();
+        String role="Restaurant";
+            
+            String roles="insert into usersRoles (role,mob_no)values(?,?)";
+            PreparedStatement preparedStatement=conn.prepareStatement(roles);
+            preparedStatement.setString(1, role);
+            preparedStatement.setString(2, mob);
+            int rows=preparedStatement.executeUpdate();
+             
        if(rows>0)
        {
         System.out.println("Restaurant registered Successfully");
@@ -210,7 +218,7 @@ int count=1;
         System.out.print("\nName: ");
         name=sc.nextLine();
           while (true) {
-        System.out.println("Mobile no: ");
+        System.out.print("Mobile no: ");
          mob=sc.nextLine();
        
             if(fetchedMobNo.contains(mob))
@@ -232,7 +240,7 @@ break;
          }
          while(true)
          {
-        System.out.println("Email: ");
+        System.out.print("Email: ");
         email=sc.nextLine();
         
                     String emailRegex="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
@@ -256,7 +264,7 @@ break;
       
         while(true)
         {
-        System.out.println("Vehicle Number: ");
+        System.out.print("Vehicle Number: ");
         vehNum=sc.nextLine();
         if(vehNum.matches(regex))
         {
@@ -266,15 +274,28 @@ break;
                 continue;
             }
             break;
+        }else
+        {
+            System.out.println("Invalid Vehicle Number");
+            continue;
         }
     }
     try {
-        String query="insert into delivery_partners (name,email,veh_no,)values(?,?,?)";
+        String query="insert into delivery_partners (name,email,veh_no,mob_no)values(?,?,?,?)";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setString(1, name);
         ps.setString(2, email);
         ps.setString(3, vehNum);
-        int rows=ps.executeUpdate();
+        ps.setString(4, mob);
+        ps.executeUpdate();
+         String role="Delivery_partner";
+            
+            String roles="insert into usersRoles (role,mob_no)values(?,?)";
+            PreparedStatement preparedStatement=conn.prepareStatement(roles);
+            preparedStatement.setString(1, role);
+            preparedStatement.setString(2, mob);
+            int rows=preparedStatement.executeUpdate();
+             
         if(rows>0)
         {
             System.out.println("Delivery Partner registered successfully");
@@ -306,6 +327,7 @@ break;
         }catch(Exception e)
         {
             System.out.println("Pls choose the valid option only [eg:1 Customer]");
+            sc.nextLine();
             continue;
         }
         if(choice==1)
