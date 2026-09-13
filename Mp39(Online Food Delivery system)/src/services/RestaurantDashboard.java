@@ -13,6 +13,54 @@ public class RestaurantDashboard {
     int flag=0;
     ArrayList <Integer>fetchedItemId=new ArrayList<>();
     String column;
+    public void viewMenu()
+    {
+        int resId=0;
+          try {
+                String query="select res_id from restaurant_registration where mob=?";
+                PreparedStatement ps=conn.prepareStatement(query);
+                ps.setString(1, CustomerVerification.mob);
+                ResultSet rs=ps.executeQuery();
+                if(rs.next())
+                {
+                    resId=rs.getInt("res_id");
+                }
+                
+            } catch (Exception e) {
+                    
+              e.printStackTrace();
+        
+            }
+        
+          
+try {
+     String query="select * from restaurant_menu where res_id=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setInt(1, resId);
+            ResultSet rs=ps.executeQuery();
+            System.out.printf("%-6s %-25s %-20s %10s%n",
+        "ID", "ITEM NAME", "CUISINE", "PRICE");
+
+System.out.println("-------------------------------------------------------------------------");
+while (rs.next()) {
+fetchedItemId.add(rs.getInt("item_id"));
+
+    int itemId = rs.getInt("item_id");
+    String itemName = rs.getString("menu_item");
+    String cuisine = rs.getString("cuisine");
+    double price = rs.getDouble("item_prize");
+
+    System.out.printf("%-6d %-25s %-20s ₹%9.2f%n",
+            itemId, itemName, cuisine, price);
+}
+
+System.out.println("==========================================================================");
+
+} catch (Exception e) {
+    e.printStackTrace();
+}
+    
+}
     public void update()
     {
         int itemID=0;
@@ -20,10 +68,13 @@ public class RestaurantDashboard {
             System.out.print("Item id:");
             try {
                 itemID=sc.nextInt();
+                sc.nextLine();
             } catch (Exception e) {
                 System.out.println("Pls enter the valid id");
                 continue;
             }
+            break;
+        }
             String updatedText=null;
             Double prize=0.0;
             if(fetchedItemId.contains(itemID))
@@ -32,7 +83,8 @@ public class RestaurantDashboard {
                 System.out.print("Enter the new value to update the selected item: ");
                 updatedText=sc.nextLine();
                 try {
-                    String query="update restaurant_menu set"+column+"=? where item_id=?";
+                    String query="update restaurant_menu set "+column+"=? where item_id=?";
+                  
                     PreparedStatement ps=conn.prepareStatement(query);
                     if(flag==0)
                     {
@@ -47,7 +99,7 @@ public class RestaurantDashboard {
                     int rows=ps.executeUpdate();
                     if(rows>0)
                     {
-                        System.out.println("Item Name Updated Successfully");
+                        System.out.println("Selected Field Updated Successfully");
                     }else
                     {
                         System.out.println("Unable to add the item Name");
@@ -55,61 +107,26 @@ public class RestaurantDashboard {
 
                 } catch (Exception e) {
                    e.printStackTrace();
+                   sc.nextLine();
+            
                 }
 
 
+            }else 
+            {
+                System.out.println("No Such Item Id");
+                
             }
             
 
             
-        }
+        
     }
     public void updateItem()
     {
-        int resId=0;
-          try {
-                String query="select res_id from restaurant_registration where mob_no=?";
-                PreparedStatement ps=conn.prepareStatement(query);
-                ps.setString(1, CustomerVerification.mob);
-                ResultSet rs=ps.executeQuery();
-                if(rs.next())
-                {
-                    resId=rs.getInt("res_id");
-                }
-                
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-        
-        while (true) {
-          
-try {
-     String query="select * from restaurant_menu where res_id=?";
-            PreparedStatement ps=conn.prepareStatement(query);
-            ps.setInt(1, resId);
-            ResultSet rs=ps.executeQuery();
-            System.out.printf("%-6s %-25s %-20s %10s%n",
-        "ID", "ITEM NAME", "CUISINE", "PRICE");
-
-System.out.println("----------------------------------------------------------");
-while (rs.next()) {
-fetchedItemId.add(rs.getInt("item_id"));
-
-    int itemId = rs.getInt("item_id");
-    String itemName = rs.getString("menu_item");
-    String cuisine = rs.getString("cuisine");
-    double price = rs.getDouble("item_price");
-
-    System.out.printf("%-6d %-25s %-20s ₹%9.2f%n",
-            itemId, itemName, cuisine, price);
-}
-
-System.out.println("==========================================================");
-
-} catch (Exception e) {
-    e.printStackTrace();
-}
-           
+       
+           while(true)
+           {
             System.out.println("1.Update name        2.Update Prize        3.Update Cuisine        4.Exit");
             int choice=0;
             try {
@@ -134,8 +151,12 @@ System.out.println("==========================================================")
            }else if(choice==3)
            {
             column="cuisine";
+            update();
            
-           }else
+           }else if(choice==4)
+            {
+                return;
+            }else
            {
              System.out.println("Invalid option selected");
             continue;
@@ -145,16 +166,19 @@ System.out.println("==========================================================")
     }
     public void removeItem()
     {
+         int itemId=0;
         while(true)
         {
         System.out.print("Item id: ");
-        int itemId=0;
+       
         try {
             itemId=sc.nextInt();
         } catch (Exception e) {
             System.out.println("Pls enter the valid item id");
             continue;
         }
+        break;
+    }
         try {
             String query="delete from restaurant_menu where item_id=?";
             PreparedStatement ps=conn.prepareStatement(query);
@@ -171,7 +195,7 @@ System.out.println("==========================================================")
         } catch (Exception e) {
         e.printStackTrace();
         }
-    }
+    
     }
     public void addItem()
     {
@@ -203,7 +227,7 @@ System.out.println("==========================================================")
     int resId=0;
     try {
 
-        String query="select res_id from restaurant_registration where mob_no=?";
+        String query="select res_id from restaurant_registration where mob=?";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setString(1, CustomerVerification.mob);
         ResultSet rs=ps.executeQuery();
@@ -215,7 +239,7 @@ System.out.println("==========================================================")
         e.printStackTrace();
     }
     try {
-        String query="insert into restaurant_menu(restaurant_id,menu_item,item_prize,cuisine)values(?,?,?,?)";
+        String query="insert into restaurant_menu(res_id,menu_item,item_prize,cuisine)values(?,?,?,?)";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, resId);
         ps.setString(2, itemName);
@@ -244,6 +268,7 @@ System.out.println("==========================================================")
     int choice=0;
     try {
         choice=sc.nextInt();
+        sc.nextLine();
     } catch (Exception e) {
         System.out.println("Pls enter the valid option [eg:2 for Exit]");
         continue;
@@ -251,8 +276,13 @@ System.out.println("==========================================================")
     
 if(choice==1)
 {
+     viewMenu();
+   
+    
     while(true)
     {
+       
+      
     System.out.println("1.Add Item        2.Remove Item        3.Update item        4.Exit");
     int  ch=0;
     try {
@@ -264,17 +294,23 @@ if(choice==1)
     }
     switch (ch) {
         case 1:
+             viewMenu();
             addItem();
             
             break;
         case 2:
+             viewMenu();
             removeItem();
             break;
         case 3:
+             viewMenu();
             updateItem();
             break;
+        case 4:
+            return;
     
         default:
+            System.out.println("Invalid choice Pls choose the Valid Option");
             break;
     }
 }
@@ -312,6 +348,9 @@ if(choice==1)
             case 1:
                 manageMenu();
                 
+                break;
+            case 2:
+                newOrders();
                 break;
            
             default:

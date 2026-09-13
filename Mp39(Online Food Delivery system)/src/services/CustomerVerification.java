@@ -16,7 +16,7 @@ import threads.*;
 public class CustomerVerification {
     Scanner sc;
     
-    
+    RestaurantDashboard resObj;
 
     Connection conn;
    
@@ -30,6 +30,7 @@ public class CustomerVerification {
            
            this.sc=sc;
            this.conn=conn;
+           resObj=new RestaurantDashboard(conn,sc);
                     
         
          
@@ -47,8 +48,18 @@ public class CustomerVerification {
     {
         try 
         {
-            System.out.println("Enter the Mobile No:");
+            while(true)
+            {            System.out.println("Enter the Mobile No:");
             mob=sc.nextLine();
+            
+if (!mob.matches("[7-9][0-9]{9}")) {
+    
+    System.out.println("Invalid mobile number");
+    continue;
+}
+break;
+            }
+
             // d.addIncome(userName);
         
          
@@ -98,6 +109,8 @@ public class CustomerVerification {
                         found=1;
                     
                     System.out.println("Login Successfull");
+                    resObj.manageMenu();
+
                    
                     
 
