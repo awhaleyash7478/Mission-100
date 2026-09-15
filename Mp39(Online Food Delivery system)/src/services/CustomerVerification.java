@@ -17,6 +17,7 @@ public class CustomerVerification {
     Scanner sc;
     
     RestaurantDashboard resObj;
+    CustomerDashboard cusObj;
 
     Connection conn;
    
@@ -31,6 +32,7 @@ public class CustomerVerification {
            this.sc=sc;
            this.conn=conn;
            resObj=new RestaurantDashboard(conn,sc);
+           cusObj=new CustomerDashboard(sc, conn);
                     
         
          
@@ -46,6 +48,7 @@ public class CustomerVerification {
         String address=null;
     public void  login()
     {
+        ArrayList <String>role=new ArrayList<>();
         try 
         {
             while(true)
@@ -72,9 +75,9 @@ break;
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1,mob );
             ResultSet rs=ps.executeQuery();
-            if(rs.next())
+            while(rs.next())
             {
-                String role=rs.getString("role");
+            role.add( rs.getString("role"));
                 System.out.println("roles: "+role);
             }
         } catch (Exception e) {
@@ -107,10 +110,43 @@ break;
                 {
                     
                         found=1;
-                    
-                    System.out.println("Login Successfull");
-                    resObj.manageMenu();
+                        int length=role.size();
+                        System.out.println(length);
+                    if(length==2)
+                    {
+                        System.out.println("1."+role.get(0)+"         2."+role.get(1));
 
+                    }
+                        else if(length==3)
+                        {
+                            int loginRole=0;
+                        while( true)
+                        {
+                            System.out.println("Login as:        1."+role.get(0)+"        2."+role.get(1)+"        3."+role.get(2)+"        4.Exit");
+                        try {
+                            loginRole=sc.nextInt();
+                        } catch (Exception e) {
+                            System.out.println("Pls enter the valid option [eg:4 for Exit]");
+                            continue;
+                        }
+                        
+                    }
+
+                        }else {
+                            if(role.contains("Customer"))
+                            {
+                                cusObj.cusMenu();
+                            }else if(role.contains("Restaurant"))
+                            {
+                                resObj.restaurantMenu();
+                            }else 
+                            {
+                                System.out.println("yet to come");
+                                return ;
+                            }
+                        }
+                
+                   
                    
                     
 
@@ -138,7 +174,9 @@ break;
                         }else if(subChoice==2)
                         {
                           
-                           register();
+                                RolesAllocation roleObj=new RolesAllocation(sc, conn);
+                           roleObj.allocateRoles();
+               register();
                         }else if(subChoice==3)
                         {
                             return;
@@ -435,6 +473,7 @@ else if(flag==0)
              break;   
                 
             case 2:
+                System.out.println("hey");
                  RolesAllocation roleObj=new RolesAllocation(sc, conn);
                            roleObj.allocateRoles();
                register();

@@ -174,16 +174,36 @@ int count=1;
             PreparedStatement preparedStatement=conn.prepareStatement(roles);
             preparedStatement.setString(1, role);
             preparedStatement.setString(2, mob);
-            int rows=preparedStatement.executeUpdate();
-             
+            preparedStatement.executeUpdate();
+              } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            String query="insert into register(user_name,mob_no,password,address,email_id)values(?,?,?,?,?)";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1,owner );
+            ps.setString(2, mob);
+            
+            
+            ps.setString(3, pass);
+            ps.setString(4,add);
+            ps.setString(5, email);
+           int rows= ps.executeUpdate();
+                 
        if(rows>0)
        {
         System.out.println("Restaurant registered Successfully");
+       }else 
+       {
+        System.out.println("Unable to register the restaurant");
        }
-           
+            
         } catch (Exception e) {
-            e.printStackTrace();
+       e.printStackTrace();
         }
+      
+           
+      
 
     }
     public void deliveryPartnerRegistration()

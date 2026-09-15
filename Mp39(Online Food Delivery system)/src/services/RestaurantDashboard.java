@@ -350,7 +350,7 @@ if(choice==1)
                 
                 break;
             case 2:
-                newOrders();
+                // newOrders();
                 break;
            
             default:
