@@ -300,6 +300,8 @@ break;
             continue;
         }
     }
+    System.out.println("Enter the Password:");
+    String pass=sc.nextLine();
     try {
         String query="insert into delivery_partners (name,email,veh_no,mob_no)values(?,?,?,?)";
         PreparedStatement ps=conn.prepareStatement(query);
@@ -308,15 +310,32 @@ break;
         ps.setString(3, vehNum);
         ps.setString(4, mob);
         ps.executeUpdate();
-         String role="Delivery_partner";
+         String role="Delivery Partner";
             
             String roles="insert into usersRoles (role,mob_no)values(?,?)";
             PreparedStatement preparedStatement=conn.prepareStatement(roles);
             preparedStatement.setString(1, role);
             preparedStatement.setString(2, mob);
-            int rows=preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
+
+            
              
-        if(rows>0)
+      
+    } catch (Exception e) {
+    e.printStackTrace();
+    }
+    try {
+         String query="insert into register(user_name,mob_no,password,email_id)values(?,?,?,?)";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1,name);
+            ps.setString(2, mob);
+            
+            
+            ps.setString(3, pass);
+            
+            ps.setString(4, email);
+           int rows= ps.executeUpdate();
+          if(rows>0)
         {
             System.out.println("Delivery Partner registered successfully");
         }else 
@@ -324,7 +343,7 @@ break;
             System.out.println("Unable to register the deilvery partner");
         }
     } catch (Exception e) {
-    e.printStackTrace();
+        // TODO: handle exception
     }
     
 

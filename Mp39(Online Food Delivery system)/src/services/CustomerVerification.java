@@ -110,55 +110,85 @@ break;
                 {
                     
                         found=1;
-                        int length=role.size();
-                        System.out.println(length);
-                    if(length==2)
-                    {
-                        System.out.println("1."+role.get(0)+"         2."+role.get(1));
-
-                    }
-                        else if(length==3)
-                        {
-                            int loginRole=0;
-                        while( true)
-                        {
-                            System.out.println("Login as:        1."+role.get(0)+"        2."+role.get(1)+"        3."+role.get(2)+"        4.Exit");
-                        try {
-                            loginRole=sc.nextInt();
-                        } catch (Exception e) {
-                            System.out.println("Pls enter the valid option [eg:4 for Exit]");
-                            continue;
-                        }
                         
-                    }
-
-                        }else {
-                            if(role.contains("Customer"))
-                            {
-                                cusObj.cusMenu();
-                            }else if(role.contains("Restaurant"))
-                            {
-                                resObj.restaurantMenu();
-                            }else 
-                            {
-                                System.out.println("yet to come");
-                                return ;
-                            }
-                        }
+           
+            HashMap <Integer,String>roles=new HashMap<>();
+                int count=1;
+                System.out.print("Login as: ");
+            for(int i=0;i<3;i++)
+            {
+                if(!role.isEmpty())
+                {
                 
-                   
-                   
-                    
-
-                    
-                
-                    
-                    
-                    
-                 
-                   
-                    }
+                System.out.print(count+"."+role.get(0)+"        ");
+                roles.put(count, role.remove(0));
+                count++;
                 }
+                if(i==2)
+                {
+                      System.out.println(count+".Exit");
+                       roles.put(count,"Exit");
+                       
+
+                }
+            }
+              
+                 System.out.println(roles);
+                 int selection=0;
+                System.out.println("Enter your choice: ");
+                try {
+                    selection=sc.nextInt();
+                } catch (Exception e) {
+                System.out.println("Pls enter the valid option [eg:4.Exit]");
+                }
+                String functionCall=null;
+               
+
+                int countNum=1;
+                int key=1;
+                
+                 while(true)
+                 {
+                   
+                     if(selection==countNum)
+                {
+                     functionCall=roles.get(key);
+                   
+                 
+                    
+              
+                 
+                    if(functionCall.startsWith("Cus"))
+                    {
+                    cusObj.cusMenu();
+                    }else if(functionCall.startsWith("Res"))
+                    {
+                        resObj.restaurantMenu();
+                    }else if(functionCall.startsWith("Exi"))
+                    {
+                        return ;
+                    }
+                    break;
+                 }
+                   key++;
+                countNum++;
+                
+              
+             
+
+
+                 }
+                
+                
+
+            
+           
+               
+             
+                
+         
+                }
+            }
                     if(found==0) 
                     {
                         System.out.println("Account not exists Pls register the account first..!");
@@ -188,13 +218,16 @@ break;
                     }
             
         
-    }catch(SQLException e)
+    
+}catch(SQLException e)
     {
         e.printStackTrace();
     }
+}
 
        
-    }
+    
+
    public  void register()
     {
        

@@ -14,6 +14,10 @@ public class CustomerDashboard {
     }
     public void searchRestaurant()
     {
+         String itemName=null;
+         double price=0.0;
+            String address=null;
+            int quantity=0;
 
         ArrayList<Integer>selectedItemIds=new ArrayList<>();
 
@@ -24,6 +28,7 @@ public class CustomerDashboard {
         String search=sc.nextLine();
         while(true)
         {
+            System.out.println("hey the control is here");
         try {
             String query="select * from restaurant_registration where res_name like ? ";
 
@@ -61,6 +66,10 @@ if(rs2.next())
     }
         
         }
+    }catch(Exception e)
+    {
+        e.printStackTrace();
+    }
         int ch=0;
         while(true)
         {
@@ -128,8 +137,8 @@ System.out.println("+------------+------------+----------+---------+");
         
         if(itemIds.contains(itemId))
         {
-            String itemName=null;
-             double price=0.0;
+           
+            
             try {
                 String order="select * from restaurant_menu where item_id=?";
                 PreparedStatement pr=conn.prepareStatement(order);
@@ -150,8 +159,7 @@ System.out.println("+------------+------------+----------+---------+");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String address=null;
-            int quantity=0;
+        
             while(true)
             {
             System.out.print("Quantity: ");
@@ -184,6 +192,7 @@ System.out.println("+------------+------------+----------+---------+");
             }
             break;
         }
+        
             if(selection==1)
             {
                 continue;
@@ -191,13 +200,27 @@ System.out.println("+------------+------------+----------+---------+");
 
             }else if(selection==2)
             {
+                System.out.println("breaking");
                 break;
                 
             }else 
             {
                 System.out.println("Invalid option allowed is 1 and 2");
+
                 
+
             }
+        
+
+        }
+        
+        else 
+        {
+            System.out.println("No such item id");
+            continue;
+        }
+            }
+            
         
             System.out.println("Address: ");
             address=sc.nextLine();
@@ -265,24 +288,19 @@ while(true)
     }
 
 
-        }else 
-        {
-            System.out.println("No such item id");
-            continue;
-        }
-    }
+    
         
         }     
             
 
 
             
-        } catch (Exception e) {
-         e.printStackTrace();
         }
-
+    
+ 
     }
-}
+
+
     public  void searchFood()
     {
         System.out.print("Name of Food item/Cuisine: ");
