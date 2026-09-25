@@ -7,13 +7,16 @@ import java.util.Scanner;
 public class CustomerDashboard {
     Scanner sc;
     Connection conn;
+    CustomerServices cusObj;
     public CustomerDashboard(Scanner sc,Connection conn)
     {
         this.sc=sc;
         this.conn=conn;
+        cusObj=new CustomerServices(conn, sc);
     }
     public void searchRestaurant()
     {
+          ArrayList<Double>storedFinalAmount=new ArrayList<>();
          String itemName=null;
          double price=0.0;
             String address=null;
@@ -26,8 +29,7 @@ public class CustomerDashboard {
         int resId=0;
         System.out.println("Restaurnat name: ");
         String search=sc.nextLine();
-        while(true)
-        {
+      
             System.out.println("hey the control is here");
         try {
             String query="select * from restaurant_registration where res_name like ? ";
@@ -70,10 +72,11 @@ if(rs2.next())
     {
         e.printStackTrace();
     }
+ 
         int ch=0;
         while(true)
         {
-        System.out.println("1.View Menu          3.Exit");
+        System.out.println("1.View Menu          2.Exit");
     
         try {
             ch=sc.nextInt();
@@ -81,7 +84,7 @@ if(rs2.next())
         System.out.println("Pls select the valid option");
         continue;
         } 
-    break;       }   
+          
     if(ch==1)
         {
             try {
@@ -177,6 +180,12 @@ System.out.println("+------------+------------+----------+---------+");
             }
             break;
         }
+            finalAmount =price*quantity;
+            storedFinalAmount.add(finalAmount);
+                     System.out.println("final amount: "+finalAmount);
+         System.out.println(storedFinalAmount);
+       
+            
               int selection=0;
             while(true)
             {
@@ -221,16 +230,27 @@ System.out.println("+------------+------------+----------+---------+");
         }
             }
             
-        
+        sc.nextLine();
             System.out.println("Address: ");
             address=sc.nextLine();
-         finalAmount =price*quantity;
+Double finalBill=0.0;
+
+          for(Double d:storedFinalAmount)
+
+          { 
+        
+                    finalBill+=d;
+        
+           
+          }
+     
        
+
         
 while(true)
 {
         System.out.println("=====PAYMENT=====");
-        System.out.println("Amount: "+finalAmount);
+        System.out.println("Amount: "+finalBill);
         System.out.println("1.UPI\n2.Card\n3.Cash on Delivery");
         int paymentMode=0;
         try {
@@ -290,126 +310,137 @@ while(true)
 
     
         
-        }     
+        }else if(ch==2)
+            {
+                return ;
+            }else  
+            {
+                System.out.println("Invalid entry allowed is 1 and 2");
+                continue;
+            }
             
 
 
             
         }
+    }
     
  
-    }
+    
 
 
-    public  void searchFood()
-    {
-        System.out.print("Name of Food item/Cuisine: ");
-        String foodName=sc.nextLine();
-int item_id=0;
-int res_id=0;
-String item_name=null,item_prize=null,res_name=null;
-        try {
-            String query="select * from restaurant_menu where menu_item like ? or cuisine like ?";
-            PreparedStatement ps=conn.prepareStatement(query);
-            ps.setString(1, "%"+foodName+"%");
-            ps.setString(2, "%"+foodName+"%");
-            ResultSet rs=ps.executeQuery();
-            if(rs.next())
-            {
-                item_id=rs.getInt("item_id");
-                item_prize=rs.getString("item_prize");
-                res_id=rs.getInt("res_id");
-                String resName="select res_name from restaurant_registration where res_id=?";
-                PreparedStatement pp=conn.prepareStatement(resName);
-                pp.setInt(1, res_id);
-                ResultSet rr=pp.executeQuery();
-                if(rr.next())
-            {
-                resName=rr.getString("res_name");
-            }
-                item_name=rs.getString("menu_item");
-                System.out.println("-----Tasty Dishes-------");
-                System.out.println("Dish Name: "+item_name);
-                System.out.println("Prize: "+item_prize);
-                System.out.println("Restaurant Name: "+res_name);
-                System.out.println("Item Id: "+item_id);
-                System.out.println("-----------------------");
+//     public  void searchFood()
+//     {
+//         System.out.print("Name of Food item/Cuisine: ");
+//         String foodName=sc.nextLine();
+// int item_id=0;
+// int res_id=0;
+// String item_name=null,item_prize=null,res_name=null;
+//         try {
+//             String query="select * from restaurant_menu where menu_item like ? or cuisine like ?";
+//             PreparedStatement ps=conn.prepareStatement(query);
+//             ps.setString(1, "%"+foodName+"%");
+//             ps.setString(2, "%"+foodName+"%");
+//             ResultSet rs=ps.executeQuery();
+//             if(rs.next())
+//             {
+//                 item_id=rs.getInt("item_id");
+//                 item_prize=rs.getString("item_prize");
+//                 res_id=rs.getInt("res_id");
+//                 String resName="select res_name from restaurant_registration where res_id=?";
+//                 PreparedStatement pp=conn.prepareStatement(resName);
+//                 pp.setInt(1, res_id);
+//                 ResultSet rr=pp.executeQuery();
+//                 if(rr.next())
+//             {
+//                 resName=rr.getString("res_name");
+//             }
+//                 item_name=rs.getString("menu_item");
+//                 System.out.println("-----Tasty Dishes-------");
+//                 System.out.println("Dish Name: "+item_name);
+//                 System.out.println("Prize: "+item_prize);
+//                 System.out.println("Restaurant Name: "+res_name);
+//                 System.out.println("Item Id: "+item_id);
+//                 System.out.println("-----------------------");
 
-            }else 
-            {
-                System.out.println("No such food item found");
-                return;
-            }
+//             }else 
+//             {
+//                 System.out.println("No such food item found");
+//                 return;
+//             }
             
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public void viewFoodMenu()
-    {
-        try {
-            int found=0;
-            String query="select * from restaurant_registration";
-            PreparedStatement ps=conn.prepareStatement(query);
-            ResultSet rs=ps.executeQuery();
-            System.out.println("+------------+------------+----------+---------+");
-System.out.println("| menu_item  | item_prize | cuisine  | item_id |");
-System.out.println("+------------+------------+----------+---------+");
-            while (rs.next()) {
-                found=1;
-                 System.out.printf("| %-10s | %-10.1f | %-8s | %-7d |%n",
-            rs.getString("menu_item"),
-            rs.getDouble("item_prize"),
-            rs.getString("cuisine"),
-            rs.getInt("item_id"));
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//         }
+//     }
+//     public void viewFoodMenu()
+//     {
+
+//         try {
+//             int found=0;
+//             String query="select * from restaurant_registration";
+//             PreparedStatement ps=conn.prepareStatement(query);
+//             ResultSet rs=ps.executeQuery();
+//             System.out.println("+------------+------------+----------+---------+");
+// System.out.println("| menu_item  | item_prize | cuisine  | item_id |");
+// System.out.println("+------------+------------+----------+---------+");
+//             while (rs.next()) {
+//                 found=1;
+//                  System.out.printf("| %-10s | %-10.1f | %-8s | %-7d |%n",
+//             rs.getString("menu_item"),
+//             rs.getDouble("item_prize"),
+//             rs.getString("cuisine"),
+//             rs.getInt("item_id"));
 
                 
-            }
-            System.out.println("+------------+------------+----------+---------+");
-            if(found==0)
-            {
-                System.out.println("No Food items yet");
-                return ;
-            }
-        } catch (Exception e) {
-           e.printStackTrace();
-        }
-    }
-    public void placeOrder()
-    {
+//             }
+//             System.out.println("+------------+------------+----------+---------+");
+//             if(found==0)
+//             {
+//                 System.out.println("No Food items yet");
+//                 return ;
+//             }
+//         } catch (Exception e) {
+//            e.printStackTrace();
+//         }
+//     }
+//     public void placeOrder()
+//     {
         
-        int choice=0;
-        while(true)
-        {
-        System.out.println("1.Search          2.Menu          3.Exit ");
+//         int choice=0;
+//         while(true)
+//         {
+//         System.out.println("1.Search          2.Menu          3.Exit ");
 
-        try {
-            choice=sc.nextInt();
-        } catch (Exception e) {
-            System.out.println("Invalid choice");
-            continue;
-        }
+//         try {
+//             choice=sc.nextInt();
+//         } catch (Exception e) {
+//             System.out.println("Invalid choice");
+//             continue;
+//         }
 
         
-        break;
+//         break;
         
-    }
-       if(choice==1)
-       {
-        searchFood();
+//     }
+//        if(choice==1)
+//        {
+//         searchFood();
 
-       }else if(choice==2)
-       {
-        viewFoodMenu();
-       }else 
-       {
-        return;
-       }
+//        }else if(choice==2)
+//        {
+//         viewFoodMenu();
+//        }else 
+//        {
+//         return;
+//        }
 
-    }
+//     }
 
     public void cusMenu()
     {
+        while(true)
+      {
         System.out.println("=================================\r\n" + //
                         "        CUSTOMER DASHBOARD\r\n" + //
                         "=================================\r\n" + //
@@ -418,16 +449,15 @@ System.out.println("+------------+------------+----------+---------+");
                         "2. View Nearby Restaurants\r\n" + //
                         "3. View Menu\r\n" + //
                         "4. My Cart\r\n" + //
-                        "5. Place Order\r\n" + //
-                        "6. Track Current Order\r\n" + //
-                        "7. My Orders\r\n" + //
-                        "8. Saved/Favourite Restaurants\r\n" + //
-                        "9. Notifications\r\n" + //
-                        "10. My Profile\r\n" + //
-                        "11. Logout");
+                       
+                        "5. Track Current Order\r\n" + //
+                        "6. My Orders\r\n" + //
+                        "7. Saved/Favourite Restaurants\r\n" + //
+                        "8. Notifications\r\n" + //
+                        "9. My Profile\r\n" + //
+                        "10. Logout");
       int choice=0;
-      while(true)
-      {
+      
       try {
         choice=sc.nextInt();
         sc.nextLine();
@@ -439,8 +469,24 @@ System.out.println("+------------+------------+----------+---------+");
     case 1:
         searchRestaurant();
 
+
         
         break;
+    case 2:
+        cusObj.viewnearbyRes();
+        break;
+    
+    case 3:
+        cusObj.viewMenu();
+        break;
+     
+    case 4:
+        cusObj.viewCart();
+        break;
+        
+    case 10:
+        return ;
+    
    
     default:
         System.out.println("Invalid choice");
