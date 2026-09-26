@@ -159,7 +159,7 @@ int count=1;
         System.out.print("Password: ");
         pass=sc.nextLine();
         try {
-            String query="insert into restaurant_registration (res_name,owner_name,email,mob,address,password )values(?,?,?,?,?,?)";
+            String query="insert into restaurant_registration (res_name,owner_name,email,mob_no,address,password )values(?,?,?,?,?,?)";
             PreparedStatement ps=conn.prepareStatement(query);
             ps.setString(1, resName);
             ps.setString(2, owner);

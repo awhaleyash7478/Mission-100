@@ -39,7 +39,7 @@ public class CustomerVerification {
     }
    
    
-    
+            static String selectedRole;
     
         String  mobNo=null;
        static String password=null;
@@ -135,9 +135,12 @@ break;
               
                  System.out.println(roles);
                  int selection=0;
+         
                 System.out.println("Enter your choice: ");
                 try {
                     selection=sc.nextInt();
+                    selectedRole=roles.get(selection);
+                    System.out.println("selected role: "+selectedRole);
                 } catch (Exception e) {
                 System.out.println("Pls enter the valid option [eg:4.Exit]");
                 }

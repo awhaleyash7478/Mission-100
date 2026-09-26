@@ -5,10 +5,12 @@ import java.sql.*;
 public class RestaurantDashboard {
     Scanner sc;
     Connection conn;
+    CommonServices commObj;
     public RestaurantDashboard(Connection conn,Scanner sc)
     {
         this.conn=conn;
         this.sc=sc;
+        commObj=new CommonServices(conn, sc);
     }
     int flag=0;
     ArrayList <Integer>fetchedItemId=new ArrayList<>();
@@ -336,7 +338,8 @@ if(choice==1)
                         "4. Order History\r\n" + //
                         "5. Update Restaurant\r\n" + //
                         "6. Notifications\r\n" + //
-                        "7. Logout");
+                        "7.View Profile\n"+
+                        "8. Logout");
                         int choice=0;
                         try {
                             choice=sc.nextInt();
@@ -352,7 +355,11 @@ if(choice==1)
             case 2:
                 // newOrders();
                 break;
-           
+            case 7:
+                commObj.myProfile();
+                break;
+
+                           
             default:
                 break;
            }

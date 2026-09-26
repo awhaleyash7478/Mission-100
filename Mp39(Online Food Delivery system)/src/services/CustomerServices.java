@@ -300,11 +300,12 @@ while(true)
             ps1.setDouble(6, finalAmount);
            ps1. executeUpdate();
 
-            String history="insert into appHistory(item_name,amount,paymentstatus)values(?,?,?)";
+            String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
             PreparedStatement ps2=conn.prepareStatement(history);
             ps2.setString(1, itemName);
             ps2.setDouble(2, finalAmount);
             ps2.setString(3, paymentStatus);
+            ps2.setString(4, CustomerVerification.mob);
             int rows=ps2.executeUpdate();
 
             
@@ -345,10 +346,16 @@ while(true)
     }
      public void viewMenu()
     {
+        
+        int itemId=0;
+        int resId=0;
+        double finalAmount=0.0;
+    ArrayList <Double>storedFinalAmount=new ArrayList<>();
+        int quantity=0;
+        ArrayList <Integer>selectItemIds=new ArrayList<>();
         ArrayList<Integer> storedItemIds=new ArrayList<>();
         int found=0;
-        double price=0.0;
-        String itemName=null;
+       
        try {
                 String order="select * from restaurant_menu ";
                 PreparedStatement pr=conn.prepareStatement(order);
@@ -356,7 +363,7 @@ while(true)
                 ResultSet rrs=pr.executeQuery();
             while(rrs.next())
                 {
-                    storedItemIds.add(rrs.getInt("item_id"));
+                    selectItemIds.add(rrs.getInt("item_id"));
                     found=1;
                     
                     System.out.println("---------Dish------------");
@@ -365,8 +372,7 @@ while(true)
                     System.out.println("Cuisine: "+rrs.getString("cuisine"));
                     System.out.println("Price: "+rrs.getString("item_prize"));
                     System.out.println("-------------------------");
-                     price=Double.parseDouble(rrs.getString("item_prize"));
-                     itemName=rrs.getString("menu_item");
+                    
                 }
               
             } catch (Exception e) {
@@ -392,6 +398,190 @@ while(true)
     }
       if(choice==1)
       {
+          double price=0.0;
+              String itemName=null;
+                while(true)
+        {
+        System.out.print("Item id: ");
+
+        try {
+            itemId=sc.nextInt();
+        } catch (Exception e) {
+            System.out.println("Invalid item id");
+            continue;
+        }
+        System.out.println(selectItemIds);
+        if(!selectItemIds.contains(itemId))
+        {
+            System.out.println("No such item id");
+            continue;
+        }
+     
+    try 
+    {
+    
+         String order="select * from restaurant_menu where item_id=?";
+                PreparedStatement pr=conn.prepareStatement(order);
+                pr.setInt(1, itemId);
+                ResultSet rrs=pr.executeQuery();
+                if(rrs.next())
+                {
+                    
+                    System.out.println("-----Selected Dish-------");
+                    System.out.println("Item Name: "+rrs.getString("menu_item"));
+                    System.out.println("Cuisine: "+rrs.getString("cuisine"));
+                    System.out.println("Price: "+rrs.getString("item_prize"));
+                    System.out.println("-------------------------");
+                     price=Double.parseDouble(rrs.getString("item_prize"));
+                     itemName=rrs.getString("menu_item");
+                }
+              
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+              while(true)
+            {
+            System.out.print("Quantity: ");
+            
+            try {
+                quantity=sc.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid quantity");
+                continue;
+            }
+            if(quantity<=0)
+            {
+                System.out.println("Quantity can't be negative or zero");
+                continue;
+            }
+            break;
+        }
+            finalAmount =price*quantity;
+            storedFinalAmount.add(finalAmount);
+                     System.out.println("final amount: "+finalAmount);
+         System.out.println(storedFinalAmount);
+       
+            
+              int selection=0;
+            while(true)
+            {
+            System.out.println("1.Add          2.Next");
+          
+            try
+            {
+            selection=sc.nextInt();
+            }catch(Exception e)
+            {
+                System.out.println("Invalid option");
+                continue;
+            }
+            break;
+        }
+        
+            if(selection==1)
+            {
+                continue;
+             
+
+            }else if(selection==2)
+            {
+                System.out.println("breaking");
+                break;
+                
+            }else 
+            {
+                System.out.println("Invalid option allowed is 1 and 2");
+
+                
+            }
+        }
+        sc.nextLine();
+              System.out.println("Address: ");
+         String address=null;
+            address=sc.nextLine();
+Double finalBill=0.0;
+
+          for(Double d:storedFinalAmount)
+
+          { 
+        
+                    finalBill+=d;
+        
+           
+          }
+     
+          
+       
+
+        
+while(true)
+{
+        System.out.println("=====PAYMENT=====");
+        System.out.println("Amount: "+finalBill);
+        System.out.println("1.UPI\n2.Card\n3.Cash on Delivery");
+        int paymentMode=0;
+        try {
+            paymentMode=sc.nextInt();
+        } catch (Exception e) {
+            System.out.println("Invalid option selected");
+            continue;
+        }
+        String paymentStatus="COD(Unpaid)";
+        
+     if(paymentMode==1||paymentMode==2||paymentMode==3)
+     {
+        if(paymentMode==1||paymentMode==2)
+            paymentStatus="Online(Paid)";
+        try {
+            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize)values(?,?,?,?,?,?)";
+            PreparedStatement ps1=conn.prepareStatement(order);
+            ps1.setInt(1, resId);
+            ps1.setString(2,CustomerVerification.mob);
+            ps1.setInt(3,itemId);
+            ps1.setString(4,address);
+            ps1.setString(5,paymentStatus);
+            ps1.setDouble(6, finalAmount);
+           ps1. executeUpdate();
+
+            String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
+            PreparedStatement ps2=conn.prepareStatement(history);
+            ps2.setString(1, itemName);
+            ps2.setDouble(2, finalAmount);
+            ps2.setString(3, paymentStatus);
+            ps2.setString(4, CustomerVerification.mob);
+            int rows=ps2.executeUpdate();
+
+            
+            if(rows>0)
+            {
+                System.out.println("Order Placed Successfully");
+                return ;
+            }else 
+            {
+                System.out.println("Unable to place the order");
+                return ;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+
+
+     }else 
+     {
+        System.out.println("Invalid option selected");
+        continue;
+     }
+    }
+
+
+    
+
+
+
+        
+
         
       }else if(choice==2)
       {
@@ -665,11 +855,12 @@ while(true)
             ps1.setDouble(6, finalAmount);
            ps1. executeUpdate();
 
-            String history="insert into appHistory(item_name,amount,paymentstatus)values(?,?,?)";
+            String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
             PreparedStatement ps2=conn.prepareStatement(history);
             ps2.setString(1, itemName);
             ps2.setDouble(2, finalAmount);
             ps2.setString(3, paymentStatus);
+            ps2.setString(4, CustomerVerification.mob);
             int rows=ps2.executeUpdate();
 
             
@@ -719,6 +910,59 @@ while(true)
        
             
     }
+    public  void myOrders()
+    {
+        try {
+            String query="select * from appHistory where mob_no=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, CustomerVerification.mob);
+            ResultSet rs=ps.executeQuery();
+            System.out.println();
+System.out.println("==============================================================");
+System.out.println("                       MY ORDERS");
+System.out.println("==============================================================");
+System.out.printf("%-10s %-15s %-12s %-20s%n",
+        "Order ID", "Item Name", "Amount", "Payment Status");
+
+System.out.println("--------------------------------------------------------------");
+ int found=0;
+
+            while (rs.next()) {
+                found=1;
+                 int orderId = rs.getInt("his_id");
+    String itemName = rs.getString("item_name");
+    double amount = rs.getDouble("amount");
+    String paymentStatus = rs.getString("paymentstatus");
+
+    System.out.printf("%-10d %-15s Rs.%-11.2f %-20s%n",
+            orderId,
+            itemName,
+            amount,
+            paymentStatus);
+                
+                
+            }
+            if(found==0)
+            {
+                System.out.println("No orders Yet");
+            }
+            
+System.out.println("==============================================================");
+
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
+    public void trackOrder()
+    {
+        System.out.println("Coming soon");
+        return;
+    }
+    public void notications()
+    {
+        System.out.println("Coming soon");
+    }
+   
    
 }
 
