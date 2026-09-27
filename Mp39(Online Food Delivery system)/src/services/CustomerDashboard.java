@@ -268,7 +268,7 @@ while(true)
         if(paymentMode==1||paymentMode==2)
             paymentStatus="Online(Paid)";
         try {
-            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize)values(?,?,?,?,?,?)";
+            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize,quantity,notification_id)values(?,?,?,?,?,?,?,?)";
             PreparedStatement ps1=conn.prepareStatement(order);
             ps1.setInt(1, resId);
             ps1.setString(2,CustomerVerification.mob);
@@ -276,6 +276,10 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
+            int defaultNotificationValue=1;
+            ps1.setInt(8, defaultNotificationValue);
+            ps1.setInt(7, quantity);
+            
            ps1. executeUpdate();
 
             String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
@@ -456,9 +460,9 @@ while(true)
                         "5. Track Current Order\r\n" + //
                         "6. My Orders\r\n" + //
                         
-                        "7. Notifications\r\n" + //
-                        "8. My Profile\r\n" + //
-                        "9. Logout");
+                     
+                        "7. My Profile\r\n" + //
+                        "8. Logout");
       int choice=0;
       
       try {
@@ -466,6 +470,7 @@ while(true)
         sc.nextLine();
       } catch (Exception e) {
        System.out.println("Pls choose the valid option [eg:11 for Logout]");
+       sc.nextLine();
        continue;
       }
    switch (choice) {
@@ -495,15 +500,13 @@ while(true)
         cusObj.myOrders();
         break;
     
+ 
     case 7:
-        cusObj.notications();
-        break;
-    case 8:
         commObj.myProfile();
      
         break;
         
-    case 9:
+    case 8:
         return ;
     
    

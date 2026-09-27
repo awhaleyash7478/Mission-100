@@ -26,6 +26,7 @@ public class RestaurantDashboard {
                 if(rs.next())
                 {
                     resId=rs.getInt("res_id");
+                    System.out.println("resid: "+resId);
                 }
                 
             } catch (Exception e) {
@@ -326,6 +327,55 @@ if(choice==1)
 
 }
 }
+public void viewOrders()
+{
+    int res_id=0;
+    try {
+        String query="select res_id from restaurant_registration where mob_no=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, CustomerVerification.mob);
+        ResultSet rs=ps.executeQuery();
+        if(rs.next())
+        {
+            res_id=rs.getInt("res_id");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    try {
+        String query="select * from appOrders where res_id=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setInt(1, res_id);
+        ResultSet rs=ps.executeQuery();
+        
+System.out.printf("%-15s %-15s %-20s %-10s %-10s %-10s%n",
+        "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
+
+System.out.println("--------------------------------------------------------------------------");
+
+int found=0;
+        while (rs.next()) {
+            found=1;
+            System.out.printf("%-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+            rs.getString("cus_mobNo"),
+            rs.getString("address"),
+            rs.getString("payment_status"),
+            rs.getDouble("prize"),
+            rs.getInt("quantity"),
+            rs.getInt("order_id"));
+
+            
+        }
+        if(found==0)
+        {
+            System.out.println("No orders yet");
+            return;
+        }
+
+    } catch (Exception e) {
+    e.printStackTrace();
+    }
+}
     public void restaurantMenu()
     {
         while(true)
@@ -333,13 +383,13 @@ if(choice==1)
         System.out.println("===== RESTAURANT DASHBOARD =====\r\n" + //
                         "\r\n" + //
                         "1. Manage Menu\r\n" + //
-                        "2. New Orders\r\n" + //
-                        "3. Current Orders\r\n" + //
-                        "4. Order History\r\n" + //
-                        "5. Update Restaurant\r\n" + //
-                        "6. Notifications\r\n" + //
-                        "7.View Profile\n"+
-                        "8. Logout");
+                        "2. View Orders\r\n" + //
+                    
+                        "3. Order History\r\n" + //
+                        "4. Update Restaurant\r\n" + //
+                    
+                        "5.View Profile\n"+
+                        "6. Logout");
                         int choice=0;
                         try {
                             choice=sc.nextInt();
@@ -353,9 +403,9 @@ if(choice==1)
                 
                 break;
             case 2:
-                // newOrders();
+                viewOrders();
                 break;
-            case 7:
+            case 6:
                 commObj.myProfile();
                 break;
 

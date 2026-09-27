@@ -290,7 +290,7 @@ while(true)
         if(paymentMode==1||paymentMode==2)
             paymentStatus="Online(Paid)";
         try {
-            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize)values(?,?,?,?,?,?)";
+            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize,quantity,notification_id)values(?,?,?,?,?,?,?,?)";
             PreparedStatement ps1=conn.prepareStatement(order);
             ps1.setInt(1, resId);
             ps1.setString(2,CustomerVerification.mob);
@@ -298,6 +298,9 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
+             int defaultNotificationValue=1;
+            ps1.setInt(8, defaultNotificationValue);
+                ps1.setInt(7, quantity);
            ps1. executeUpdate();
 
             String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
@@ -426,6 +429,8 @@ while(true)
                 ResultSet rrs=pr.executeQuery();
                 if(rrs.next())
                 {
+                    resId=rrs.getInt("res_id");
+
                     
                     System.out.println("-----Selected Dish-------");
                     System.out.println("Item Name: "+rrs.getString("menu_item"));
@@ -533,7 +538,7 @@ while(true)
         if(paymentMode==1||paymentMode==2)
             paymentStatus="Online(Paid)";
         try {
-            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize)values(?,?,?,?,?,?)";
+            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize,quantity,notification_id)values(?,?,?,?,?,?,?,?)";
             PreparedStatement ps1=conn.prepareStatement(order);
             ps1.setInt(1, resId);
             ps1.setString(2,CustomerVerification.mob);
@@ -541,6 +546,9 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
+             int defaultNotificationValue=1;
+            ps1.setInt(8, defaultNotificationValue);
+                ps1.setInt(7, quantity);
            ps1. executeUpdate();
 
             String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
@@ -700,7 +708,7 @@ while(true)
         }
         while(true)
         {
-        System.out.println("1.Order          2.Exit");
+        System.out.println("1.Order          2.Empty           3.Exit");
         int option=0;
         try {
             option=sc.nextInt();
@@ -845,7 +853,7 @@ while(true)
         if(paymentMode==1||paymentMode==2)
             paymentStatus="Online(Paid)";
         try {
-            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize)values(?,?,?,?,?,?)";
+            String order="insert into appOrders(res_id,cus_mobno,item_id,address,payment_status,prize,quantity,notification_id)values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps1=conn.prepareStatement(order);
             ps1.setInt(1, resId);
             ps1.setString(2,CustomerVerification.mob);
@@ -853,6 +861,9 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
+             int defaultNotificationValue=1;
+            ps1.setInt(8, defaultNotificationValue);
+                ps1.setInt(7, quantity);
            ps1. executeUpdate();
 
             String history="insert into appHistory(item_name,amount,paymentstatus,mob_no)values(?,?,?,?)";
@@ -897,7 +908,79 @@ while(true)
 
        }else if(option==2)
        {
-        return ;
+            int choice=0;
+            while(true)
+        {
+        System.out.println("1.Remove by id          2.Remove all         3.Exit");
+    
+        try {
+            choice=sc.nextInt();
+        } catch (Exception e) {
+            System.out.println("enter the valid option [eg.3 for exit]");
+            continue;
+            
+        }
+        break;
+    }
+        if(choice==1)
+        {
+            while(true){
+            System.out.println("Item id: ");
+            int itemID=0;
+            try {
+                itemID=sc.nextInt();
+            } catch (Exception e) {
+                 System.out.println("Pls enter the valid item id");
+                 continue;
+           }
+           if(!selectItemIds.contains(itemID))
+           {
+            System.out.println("No such item id");
+            continue;
+           }
+           break;
+        
+        }
+        try {
+            String delete="delete from cartItems where item_id=?";
+            PreparedStatement pp=conn.prepareStatement(delete);
+            pp.setInt(1, itemId);
+            int rows=pp.executeUpdate();
+            if(rows>0)
+            {
+                System.out.println("Item removed from Cart");
+                return;
+            }else 
+            {
+                System.out.println("Unable to remove the item");
+                return;
+            }
+        
+        } catch (Exception e) {
+         e.printStackTrace();    
+        }
+
+        }else if(choice==2)
+        {
+            try {
+                String deleteAll="delete from cartItems where mob_no=?";
+                PreparedStatement pr=conn.prepareStatement(deleteAll);
+                pr.setString(1, CustomerVerification.mob);
+                int rows=pr.executeUpdate();
+                if(rows>0)
+                {
+                    System.out.println("Cart is empty");
+                    return ;
+                }else 
+                {
+                    System.out.println("Unable to empty the cart");
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    
        }else 
        {
         System.out.println("Invalid option allowed is 1 and 2");

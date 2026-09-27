@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 import threads.*;
+import threads.Notifications.RestaurantNotification;
 
 public class CustomerVerification {
     Scanner sc;
@@ -39,15 +40,17 @@ public class CustomerVerification {
     }
    
    
-            static String selectedRole;
+           public  static String selectedRole;
     
         String  mobNo=null;
        static String password=null;
       public  static String userName ;
-      static String mob;
+     public  static String mob;
         String address=null;
     public void  login()
     {
+               HashMap <Integer,String>roles=new HashMap<>();
+          int selection=0;
         ArrayList <String>role=new ArrayList<>();
         try 
         {
@@ -112,7 +115,7 @@ break;
                         found=1;
                         
            
-            HashMap <Integer,String>roles=new HashMap<>();
+     
                 int count=1;
                 System.out.print("Login as: ");
             for(int i=0;i<3;i++)
@@ -134,7 +137,7 @@ break;
             }
               
                  System.out.println(roles);
-                 int selection=0;
+               
          
                 System.out.println("Enter your choice: ");
                 try {
@@ -144,6 +147,14 @@ break;
                 } catch (Exception e) {
                 System.out.println("Pls enter the valid option [eg:4.Exit]");
                 }
+            if(selectedRole.equals("Restaurant"))
+            {
+                RestaurantNotification resObj=new RestaurantNotification(conn);
+                
+                    resObj.start();
+                 
+                }
+            }
                 String functionCall=null;
                
 
@@ -191,6 +202,9 @@ break;
                 
          
                 }
+            }catch(Exception e)
+            {
+                e.printStackTrace();
             }
                     if(found==0) 
                     {
@@ -222,11 +236,8 @@ break;
             
         
     
-}catch(SQLException e)
-    {
-        e.printStackTrace();
-    }
 }
+
 
        
     
