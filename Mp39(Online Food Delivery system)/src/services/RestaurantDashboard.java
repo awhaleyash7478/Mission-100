@@ -329,6 +329,7 @@ if(choice==1)
 }
 public void viewOrders()
 {
+    ArrayList<Integer>orderId=new ArrayList<>();
     int res_id=0;
     try {
         String query="select res_id from restaurant_registration where mob_no=?";
@@ -347,6 +348,8 @@ public void viewOrders()
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, res_id);
         ResultSet rs=ps.executeQuery();
+    
+     
         
 System.out.printf("%-15s %-15s %-20s %-10s %-10s %-10s%n",
         "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
@@ -356,6 +359,7 @@ System.out.println("------------------------------------------------------------
 int found=0;
         while (rs.next()) {
             found=1;
+                orderId.add(rs.getInt("order_id"));
             System.out.printf("%-15s %-15s %-20s %-10.2f %-10d %-10d%n",
             rs.getString("cus_mobNo"),
             rs.getString("address"),
@@ -375,6 +379,196 @@ int found=0;
     } catch (Exception e) {
     e.printStackTrace();
     }
+    while( true)
+    {
+    System.out.println("1.Accept Order          2.Exit");
+    int option=0;
+     try {
+        option=sc.nextInt();
+     } catch (Exception e) {
+        System.out.println("Pls enter the valid option no.");
+        continue;
+     
+    }
+    if(option==1)
+        {
+            acceptOrder(orderId);
+
+        }else if(option==2)
+        {
+            return ;
+        }else 
+        {
+            System.out.println("Pls enter the valid option no. allowed is 1 and 2");
+            continue;
+        }
+    }
+}
+public void acceptOrder(ArrayList<Integer> orderId)
+{
+    // int orderID;
+    // orderID=orderId;
+ while(true)
+ {
+    System.out.print("Order id: ");
+    int enteredOrderId=0;
+    try {
+        enteredOrderId=sc.nextInt();
+    } catch (Exception e) {
+     System.out.println("Pls enter the valid order id");
+     continue;
+    }
+    if(orderId.contains(enteredOrderId))
+    {
+        String status="accepted";
+        try{
+        String query="insert into appOrders(order_status)values(?)where order_id=?";
+     PreparedStatement ps=conn.prepareStatement(query);
+     ps.setString(1, status);
+     ps.setInt(2, enteredOrderId);
+     int rows=ps.executeUpdate();
+     if(rows>0)
+        {
+           System.out.println("Order accepted Successfully");
+        return ;
+        }else 
+            {
+                System.out.println("Something went wrong");
+                return ;
+            }    
+    }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+       
+
+    }else 
+    {
+        System.out.println("No such Order id");
+        return;
+    }
+}
+
+
+}
+public void assignDeliveryPartner(ArrayList orderId)
+{
+    int order_id=0;
+   while(true)
+   {
+    System.out.print("Order Id: ");
+    try {
+        order_id=sc.nextInt();
+        
+    } catch (Exception e) {
+      System.out.println("Invalid order id");
+      continue;
+    }
+    if(!orderId.contains(order_id))
+    {
+        System.out.println("No Such Order id");
+    }else {
+        break;
+    }
+    
+}
+    
+    int delivery_partner_id=0;
+    try {
+        String status="free";
+        String query="select delivery_partner_id from deilvery_partners where status=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, status);
+        ResultSet rs=ps.executeQuery();
+        if(rs.next())
+            {
+                delivery_partner_id=rs.getInt("delivery_partner_id");
+
+            }else 
+                {
+                    System.out.println("Currently no delivery partner available");
+                    return;
+                }    
+    } catch (Exception e) {
+       e.printStackTrace();
+    }
+    try {
+        String query="insert into appOrders (delivery_partner_id)value(?)where order_id=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setInt(1, order_id);
+        int rows=ps.executeUpdate();
+        if(rows>0)
+        {
+            System.out.println("Delivery Partner Assigned");
+        return ;
+        }else {
+            System.out.println("Something went wrong");
+            return;
+        }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+}
+public void acceptedOrders()
+{
+    ArrayList <Integer>orderIds=new ArrayList<>();
+    String status="accepted";
+    try {
+        String query="select * from appOrders where order_status=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, status);
+        ResultSet rs=ps.executeQuery();
+               
+System.out.printf("%-15s %-15s %-20s %-10s %-10s %-10s%n",
+        "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
+
+System.out.println("--------------------------------------------------------------------------");
+int found=0;
+        while (rs.next()) {
+              found=1;
+              orderIds.add(rs.getInt("order_id"));
+                
+            System.out.printf("%-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+            rs.getString("cus_mobNo"),
+            rs.getString("address"),
+            rs.getString("payment_status"),
+            rs.getDouble("prize"),
+            rs.getInt("quantity"),
+            rs.getInt("order_id"));
+            
+        }
+        if(found==0)
+        {
+            System.out.println("No Accepted Orders Yet");
+            return;
+        }
+           int choice=0;
+        while (true) {
+            
+        
+        System.out.println("1.Assign Delivery Partner          2.Exit");
+     
+        try {
+            choice=sc.nextInt();
+        } catch (Exception e) {
+            System.out.println("Pls enter the valid option");
+            continue;
+        }
+        if(choice==1)
+        {
+            assignDeliveryPartner(orderIds);
+        }else if(choice==2)
+        {
+            return ;
+        }else
+        {
+            System.out.println("Invalid option selected");
+            continue;
+        }
+    }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 }
     public void restaurantMenu()
     {
@@ -384,9 +578,9 @@ int found=0;
                         "\r\n" + //
                         "1. Manage Menu\r\n" + //
                         "2. View Orders\r\n" + //
-                    
-                        "3. Order History\r\n" + //
-                        "4. Update Restaurant\r\n" + //
+                        "3.Accepted Orders\n"+
+                        "4. Order History\r\n" + //
+                        
                     
                         "5.View Profile\n"+
                         "6. Logout");
@@ -405,9 +599,15 @@ int found=0;
             case 2:
                 viewOrders();
                 break;
-            case 6:
+            
+            case 3:
+                acceptedOrders();
+                break;
+            case 5:
                 commObj.myProfile();
                 break;
+            case 6:
+                return ;
 
                            
             default:
