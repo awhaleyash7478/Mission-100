@@ -19,7 +19,7 @@ public class RestaurantDashboard {
     {
         int resId=0;
           try {
-                String query="select res_id from restaurant_registration where mob=?";
+                String query="select res_id from restaurant_registration where mob_no=?";
                 PreparedStatement ps=conn.prepareStatement(query);
                 ps.setString(1, CustomerVerification.mob);
                 ResultSet rs=ps.executeQuery();
@@ -230,7 +230,7 @@ System.out.println("============================================================
     int resId=0;
     try {
 
-        String query="select res_id from restaurant_registration where mob=?";
+        String query="select res_id from restaurant_registration where mob_no=?";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setString(1, CustomerVerification.mob);
         ResultSet rs=ps.executeQuery();
@@ -329,6 +329,8 @@ if(choice==1)
 }
 public void viewOrders()
 {
+    String fetcheditemName=null;
+    int flag=0;
     ArrayList<Integer>orderId=new ArrayList<>();
     int res_id=0;
     try {
@@ -343,6 +345,8 @@ public void viewOrders()
     } catch (Exception e) {
         e.printStackTrace();
     }
+double final_amount=0.0;
+    int quantity=0;
     try {
         String query="select * from appOrders where res_id=?";
         PreparedStatement ps=conn.prepareStatement(query);
@@ -351,16 +355,37 @@ public void viewOrders()
     
      
         
-System.out.printf("%-15s %-15s %-20s %-10s %-10s %-10s%n",
-        "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
+System.out.printf("%-15s %-15s %-15s %-20s %-10s %-10s %-10s%n",
+        "Item Name", "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
 
-System.out.println("--------------------------------------------------------------------------");
+System.out.println("----------------------------------------------------------------------------------------------------------");
 
 int found=0;
+int fetchedItemId=0;
+
         while (rs.next()) {
             found=1;
+            quantity=rs.getInt("quantity");
+            final_amount=rs.getDouble("prize");
+
+            fetchedItemId=rs.getInt("item_id");
+            
+            try {
+                String query2="select menu_item from restaurant_menu where item_id=?";
+                PreparedStatement ps2=conn.prepareStatement(query2);
+                ps2.setInt(1, fetchedItemId);
+                ResultSet rs2=ps2.executeQuery();
+                if(rs2.next())
+                {
+                    fetcheditemName=rs2.getString("menu_item");
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
                 orderId.add(rs.getInt("order_id"));
-            System.out.printf("%-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+            System.out.printf("%-15s %-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+            fetcheditemName,
             rs.getString("cus_mobNo"),
             rs.getString("address"),
             rs.getString("payment_status"),
@@ -381,7 +406,7 @@ int found=0;
     }
     while( true)
     {
-    System.out.println("1.Accept Order          2.Exit");
+    System.out.println("\n1.Accept Order          2.Reject        3.Exit");
     int option=0;
      try {
         option=sc.nextInt();
@@ -392,26 +417,33 @@ int found=0;
     }
     if(option==1)
         {
-            acceptOrder(orderId);
+            acceptOrder(orderId,flag,res_id,fetcheditemName,quantity,final_amount);
 
         }else if(option==2)
         {
-            return ;
-        }else 
+            flag=1;
+            acceptOrder(orderId, flag, res_id, fetcheditemName, quantity, final_amount);
+        }else if(option==3)
+        {
+            return;
+        }
+        else  
         {
             System.out.println("Pls enter the valid option no. allowed is 1 and 2");
             continue;
         }
     }
 }
-public void acceptOrder(ArrayList<Integer> orderId)
+public void acceptOrder(ArrayList<Integer> orderId,int flag,int res_id,String itemName,int quantity,double final_amount)
 {
     // int orderID;
     // orderID=orderId;
+       int enteredOrderId=0;
+          String status=null;
  while(true)
  {
     System.out.print("Order id: ");
-    int enteredOrderId=0;
+ 
     try {
         enteredOrderId=sc.nextInt();
     } catch (Exception e) {
@@ -420,22 +452,37 @@ public void acceptOrder(ArrayList<Integer> orderId)
     }
     if(orderId.contains(enteredOrderId))
     {
-        String status="accepted";
+     
         try{
-        String query="insert into appOrders(order_status)values(?)where order_id=?";
+        String query="update appOrders set order_status=? where order_id=? ";
      PreparedStatement ps=conn.prepareStatement(query);
+     if(flag==0)
+     {
+            status="accepted";
      ps.setString(1, status);
      ps.setInt(2, enteredOrderId);
+     }else 
+     {
+        status="rejected";
+        ps.setString(1, status);
+        ps.setInt(2, enteredOrderId);
+     }
+
      int rows=ps.executeUpdate();
-     if(rows>0)
+     if(rows>0 && status.equals("accepted"))
         {
            System.out.println("Order accepted Successfully");
-        return ;
-        }else 
+      break;
+        }else if(rows>0 && status.equals("rejected")) 
             {
-                System.out.println("Something went wrong");
-                return ;
-            }    
+                System.out.println("Order rejected Successfully");
+                
+              break;
+            } else 
+                {
+                    System.out.println("Something went wrong");
+                    break;
+                }  
     }catch(Exception e)
         {
             e.printStackTrace();
@@ -448,8 +495,77 @@ public void acceptOrder(ArrayList<Integer> orderId)
         return;
     }
 }
+try {
+    String query="insert into appOrderHistory(order_id,status,res_id,item_name,quantity,final_amount)values(?,?,?,?,?,?)";
+    PreparedStatement ps=conn.prepareStatement(query);
+    ps.setInt(1, enteredOrderId);
+    ps.setString(2, status);
+    ps.setInt(3, res_id);
+    ps.setString(4,itemName );
+    ps.setInt(5, quantity);
+    ps.setDouble(6, final_amount);
+
+    ps.executeUpdate();
+    return;
 
 
+} catch (Exception e) {
+    e.printStackTrace();
+
+
+}
+}
+
+public void viewOrderHistory()
+{
+    int res_id=0;
+    try {
+        String query="select res_id from restaurant_registration where mob_no=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setString(1, CustomerVerification.mob);
+        ResultSet rs=ps.executeQuery();
+        if(rs.next())
+        {
+            res_id=rs.getInt("res_id");
+        }
+    } catch (Exception e) {
+e.printStackTrace();
+    }
+    try {
+        String query="select * from appOrderHistory where res_id=?";
+        PreparedStatement ps=conn.prepareStatement(query);
+        ps.setInt(1, res_id);
+        ResultSet rs=ps.executeQuery();
+   System.out.printf(
+    "%-10s %-15s %-20s %-10s %-15s%n",
+    "order_id", "status", "item_name", "quantity", "final_amount"
+);
+String result = "-".repeat(75);
+System.out.println(result);
+
+   int found=0;
+        while (rs.next()) {
+            found=1;
+         System.out.printf(
+        "%-10d %-15s %-20s %-10d %-15.2f%n",
+        rs.getInt("order_id"),
+        rs.getString("status"),
+        rs.getString("item_name"),
+        rs.getInt("quantity"),
+        rs.getDouble("final_amount")
+    );
+
+            
+        }
+        if(found==0)
+        {
+            System.out.println("No Order History yet");
+            return;
+        }
+
+    } catch (Exception e) {
+     e.printStackTrace();
+    }
 }
 public void assignDeliveryPartner(ArrayList orderId)
 {
@@ -476,7 +592,7 @@ public void assignDeliveryPartner(ArrayList orderId)
     int delivery_partner_id=0;
     try {
         String status="free";
-        String query="select delivery_partner_id from deilvery_partners where status=?";
+        String query="select delivery_partner_id from delivery_partners where status=?";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setString(1, status);
         ResultSet rs=ps.executeQuery();
@@ -493,7 +609,7 @@ public void assignDeliveryPartner(ArrayList orderId)
        e.printStackTrace();
     }
     try {
-        String query="insert into appOrders (delivery_partner_id)value(?)where order_id=?";
+        String query="update appOrders set delivery_partner_id =? where order_id=?";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, order_id);
         int rows=ps.executeUpdate();
@@ -519,22 +635,40 @@ public void acceptedOrders()
         ps.setString(1, status);
         ResultSet rs=ps.executeQuery();
                
-System.out.printf("%-15s %-15s %-20s %-10s %-10s %-10s%n",
-        "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
+System.out.printf("%-15s %-15s %-15s %-20s %-10s %-10s %-10s%n",
+        "Item Name", "Mobile", "Address", "Payment", "Price", "Quantity", "Order ID");
 
-System.out.println("--------------------------------------------------------------------------");
+System.out.println("---------------------------------------------------------------------------------------------------------");
 int found=0;
+String item_name=null;
         while (rs.next()) {
+             
               found=1;
               orderIds.add(rs.getInt("order_id"));
-                
-            System.out.printf("%-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+              
+             int item_id=   rs.getInt("item_id");
+                try {
+                String query2="select menu_item from restaurant_menu where item_id=?";
+                PreparedStatement ps2=conn.prepareStatement(query2);
+                ps2.setInt(1, item_id);
+                ResultSet rs2=ps2.executeQuery();
+                if(rs2.next())
+                {
+                    item_name=rs2.getString("menu_item");
+
+                }
+             } catch (Exception e) {
+                e.printStackTrace();
+             }
+            System.out.printf("%-15s %-15s %-15s %-20s %-10.2f %-10d %-10d%n",
+            item_name,
             rs.getString("cus_mobNo"),
             rs.getString("address"),
             rs.getString("payment_status"),
             rs.getDouble("prize"),
             rs.getInt("quantity"),
             rs.getInt("order_id"));
+
             
         }
         if(found==0)
@@ -546,7 +680,7 @@ int found=0;
         while (true) {
             
         
-        System.out.println("1.Assign Delivery Partner          2.Exit");
+        System.out.println("\n1.Assign Delivery Partner          2.Exit");
      
         try {
             choice=sc.nextInt();
@@ -602,6 +736,9 @@ int found=0;
             
             case 3:
                 acceptedOrders();
+                break;
+            case 4:
+                viewOrderHistory();
                 break;
             case 5:
                 commObj.myProfile();

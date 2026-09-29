@@ -150,7 +150,7 @@ break;
             if(selectedRole.equals("Restaurant"))
             {
                 RestaurantNotification resObj=new RestaurantNotification(conn);
-                
+                  resObj.setDaemon(true);
                     resObj.start();
                  
                 }
