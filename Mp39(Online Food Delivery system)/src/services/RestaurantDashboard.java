@@ -1,5 +1,9 @@
 package services;
 import java.util.*;
+
+import threads.deliveryPartnerAssignmentThread;
+import threads.Notifications.RestaurantNotification;
+
 import java.sql.*;
 
 public class RestaurantDashboard {
@@ -348,9 +352,11 @@ public void viewOrders()
 double final_amount=0.0;
     int quantity=0;
     try {
-        String query="select * from appOrders where res_id=?";
+        String defaultStatus="ordered";
+        String query="select * from appOrders where res_id=? and order_status =?";
         PreparedStatement ps=conn.prepareStatement(query);
         ps.setInt(1, res_id);
+        ps.setString(2,defaultStatus);
         ResultSet rs=ps.executeQuery();
     
      
@@ -471,6 +477,7 @@ public void acceptOrder(ArrayList<Integer> orderId,int flag,int res_id,String it
      int rows=ps.executeUpdate();
      if(rows>0 && status.equals("accepted"))
         {
+          
            System.out.println("Order accepted Successfully");
       break;
         }else if(rows>0 && status.equals("rejected")) 
@@ -584,46 +591,20 @@ public void assignDeliveryPartner(ArrayList orderId)
     {
         System.out.println("No Such Order id");
     }else {
-        break;
+      
+    
+    deliveryPartnerAssignmentThread delObj=new deliveryPartnerAssignmentThread(conn,order_id);
+    System.out.println("starting thread");
+    
+    delObj.setDaemon(true);
+    delObj.start();
+    
     }
     
 }
     
-    int delivery_partner_id=0;
-    try {
-        String status="free";
-        String query="select delivery_partner_id from delivery_partners where status=?";
-        PreparedStatement ps=conn.prepareStatement(query);
-        ps.setString(1, status);
-        ResultSet rs=ps.executeQuery();
-        if(rs.next())
-            {
-                delivery_partner_id=rs.getInt("delivery_partner_id");
-
-            }else 
-                {
-                    System.out.println("Currently no delivery partner available");
-                    return;
-                }    
-    } catch (Exception e) {
-       e.printStackTrace();
-    }
-    try {
-        String query="update appOrders set delivery_partner_id =? where order_id=?";
-        PreparedStatement ps=conn.prepareStatement(query);
-        ps.setInt(1, order_id);
-        int rows=ps.executeUpdate();
-        if(rows>0)
-        {
-            System.out.println("Delivery Partner Assigned");
-        return ;
-        }else {
-            System.out.println("Something went wrong");
-            return;
-        }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  
+   
 }
 public void acceptedOrders()
 {
@@ -706,6 +687,9 @@ String item_name=null;
 }
     public void restaurantMenu()
     {
+        RestaurantNotification resObj=new RestaurantNotification(conn);
+                  resObj.setDaemon(true);
+                     resObj.start();
         while(true)
         {
         System.out.println("===== RESTAURANT DASHBOARD =====\r\n" + //

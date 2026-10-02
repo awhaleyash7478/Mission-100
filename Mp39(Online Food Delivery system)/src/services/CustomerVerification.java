@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 import threads.*;
+import threads.Notifications.DeliveryPartnerNotification;
 import threads.Notifications.RestaurantNotification;
 
 public class CustomerVerification {
@@ -81,7 +82,7 @@ break;
             while(rs.next())
             {
             role.add( rs.getString("role"));
-                System.out.println("roles: "+role);
+                // System.out.println("roles: "+role);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,24 +137,31 @@ break;
                 }
             }
               
-                 System.out.println(roles);
+                //  System.out.println(roles);
                
          
                 System.out.println("Enter your choice: ");
                 try {
                     selection=sc.nextInt();
                     selectedRole=roles.get(selection);
-                    System.out.println("selected role: "+selectedRole);
+                    
                 } catch (Exception e) {
                 System.out.println("Pls enter the valid option [eg:4.Exit]");
                 }
-            if(selectedRole.equals("Restaurant"))
-            {
-                RestaurantNotification resObj=new RestaurantNotification(conn);
-                  resObj.setDaemon(true);
-                    resObj.start();
+            // if(selectedRole.equals("Restaurant"))
+            // {
+            //     RestaurantNotification resObj=new RestaurantNotification(conn);
+            //       resObj.setDaemon(true);
+            //         resObj.start();
                  
-                }
+            //     }else if(selectedRole.equals("Delivery Partner")) 
+            //     {
+            //         DeliveryPartnerDashboard del=new DeliveryPartnerDashboard(conn, sc);
+            //         del.menu();
+           
+
+                    
+            //     }
             }
                 String functionCall=null;
                
@@ -178,7 +186,13 @@ break;
                     }else if(functionCall.startsWith("Res"))
                     {
                         resObj.restaurantMenu();
-                    }else if(functionCall.startsWith("Exi"))
+                    }else if(functionCall.startsWith("Del"))
+                    {
+                        DeliveryPartnerDashboard d=new DeliveryPartnerDashboard(conn, sc);
+                        d.menu();
+          
+                    }
+                    else if(functionCall.startsWith("Exi"))
                     {
                         return ;
                     }

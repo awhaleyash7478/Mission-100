@@ -15,7 +15,7 @@ public class RestaurantNotification extends Thread {
 int res_id=0;
     try {
 
-      System.out.println("entered 1");
+     
       String query="select res_id from restaurant_registration where mob_no=?";
       PreparedStatement ps=conn.prepareStatement(query);
       ps.setString(1, CustomerVerification.mob);

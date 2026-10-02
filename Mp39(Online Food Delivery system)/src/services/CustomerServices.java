@@ -1038,8 +1038,66 @@ System.out.println("============================================================
     }
     public void trackOrder()
     {
-        System.out.println("Coming soon");
-        return;
+//         try {
+//             // String query="select status from appOrders where cus_mobNo=?";
+//             String query="select o.order_id,o.quantity,o.order_status,m.menu_item from appOrders o join restaurant_menu m on o.item_id=m.item_id where o.order_id=?";
+//             PreparedStatement ps=conn.prepareStatement(query);
+//             ps.setString(1, CustomerVerification.mob);
+//             ResultSet rs=ps.executeQuery();
+//               while (rs.next()) {
+//                 int item_id=rs.getInt("item_id");
+//                 String query2="select menu_item from restaurant_menu where item_id=?";
+//                 PreparedStatement ps2=conn.prepareStatement(query2);
+//                 ps2.setInt(1, item_id);
+//                  ResultSet rs2=ps2.executeQuery();
+//                  String item_name=null;
+//                  if(rs2.next())
+//                  {
+//                     item_name=rs.getString("menu_item");
+
+//                  }
+//                  SELECT o.order_id,
+//        o.quantity,
+//        o.order_status,
+//        m.menu_item
+// FROM appOrders o
+// JOIN restaurant_menu m ON o.item_id = m.item_id
+// WHERE o.cus_mobNo =9764667478;
+
+                
+//               }
+//         } catch (Exception e) {
+//             // TODO: handle exception
+//         }
+
+         try {
+            String query="select o.order_id ,o.quantity,o.order_status,menu_item from appOrders o join restaurant_menu r on o.item_id=r.item_id where cus_mobNo=?";
+            PreparedStatement ps=conn.prepareStatement(query);
+            ps.setString(1, CustomerVerification.mob);
+           
+            
+    
+        
+       
+            ResultSet rs=ps.executeQuery();
+            System.out.printf("%-10s | %-8s | %-12s | %-10s%n",
+        "order_id", "quantity", "order_status", "menu_item");
+
+System.out.println("-----------------------------------------------");
+            while(rs.next())
+            {
+                System.out.printf("%-10d | %-8d | %-12s | %-10s%n",
+            rs.getInt("order_id"),
+            rs.getInt("quantity"),
+            rs.getString("order_status"),
+            rs.getString("menu_item"));
+
+            }
+            
+
+         } catch (Exception e) {
+          e.printStackTrace();
+         }
     }
     public void notications()
     {

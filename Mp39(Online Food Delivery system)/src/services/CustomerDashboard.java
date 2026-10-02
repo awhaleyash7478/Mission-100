@@ -51,6 +51,9 @@ public class CustomerDashboard {
             }else 
             {
                 System.out.println("Unable to find the Restaurant");
+                return ;
+            }
+            
                
                  String query2="select * from restaurant_registration where res_name like ? ";
 
@@ -69,7 +72,7 @@ if(rs2.next())
 
     }
         
-        }
+        
     }catch(Exception e)
     {
         e.printStackTrace();

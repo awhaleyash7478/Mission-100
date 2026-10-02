@@ -29,7 +29,7 @@ public class RolesAllocation {
            
             while (rr.next()) {
                  storedUserName.add(rr.getString("res_name"));
-                 fetchedMobNo.add(rr.getString("mob"));
+                 fetchedMobNo.add(rr.getString("mob_no"));
                  fetchedEmailId.add(rr.getString("email"));
                  resId=rr.getInt("res_id");
                       
