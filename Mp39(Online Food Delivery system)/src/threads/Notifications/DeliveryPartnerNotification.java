@@ -41,8 +41,8 @@ public class DeliveryPartnerNotification extends Thread {
             ResultSet rs=ps.executeQuery();
             while(rs.next())
             {
-                res_add=rs.getString("cus");
-                cus_add=rs.getString("res");
+                res_add=rs.getString("res");
+                cus_add=rs.getString("cus");
                 order_id=rs.getInt("ord");
       System.out.println(
     "\n+------------------------------------------+" +

@@ -133,11 +133,11 @@ System.out.println("+------------+------------+----------+---------+");
                 continue;
             }
                 selectedItemIds.add(itemId);
-                System.out.println("after entering itemid: "+selectedItemIds);
+                
                 for(int itemIdss:selectedItemIds)
                 {
                     itemId=itemIdss;
-                    System.out.println("itemidss: "+itemIdss);
+                  
 
                 }
             
@@ -279,7 +279,7 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
-            int defaultNotificationValue=1;
+            int defaultNotificationValue=2;
             ps1.setInt(8, defaultNotificationValue);
             ps1.setInt(7, quantity);
             

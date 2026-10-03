@@ -18,7 +18,7 @@ public class deliveryPartnerAssignmentThread extends Thread{
           while(true)
           {
          try {
-            System.out.println("entered the thread");
+            
         String status="free";
         String query="select delivery_partner_id from delivery_partners where status=?";
         PreparedStatement ps=conn.prepareStatement(query);
@@ -55,10 +55,7 @@ public class deliveryPartnerAssignmentThread extends Thread{
         ps.setString(2, orderStatus);
         ps.setInt(3, order_id);
         int rows=ps.executeUpdate();
-        if(rows>0)
-        {
-            System.out.println("Assigning Delivery Partner");
-        }
+       
        
    
     } catch (Exception e) {

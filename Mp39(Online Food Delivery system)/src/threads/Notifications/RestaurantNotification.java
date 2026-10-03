@@ -31,11 +31,13 @@ int res_id=0;
      e.printStackTrace();
     }
     try {
+      int defaultValue=1;
       while(true)
       {
-      String query="select * from appOrders where res_id=? and notification_id is not null";
+      String query="select * from appOrders where res_id=? and notification_id  <>? and notification_id is not null";
       PreparedStatement ps=conn.prepareStatement(query);
       ps.setInt(1,res_id );
+      ps.setInt(2, defaultValue);
       ResultSet rs=ps.executeQuery();
       while (rs.next()) {
         int notificationId=rs.getInt("notification_id");
@@ -72,7 +74,7 @@ int res_id=0;
     System.out.println("╚══════════════════════════════════════╝");
     
     String setNofication="update appOrders set notification_id=null where notification_id=? and order_id=?";
-    int defaultNotificationValue=0;
+    // int defaultNotificationValue=0;
     PreparedStatement ppp=conn.prepareStatement(setNofication);
  
     ppp.setInt(1, notificationId);

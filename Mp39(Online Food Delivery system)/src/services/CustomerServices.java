@@ -298,7 +298,7 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
-             int defaultNotificationValue=1;
+             int defaultNotificationValue=2;
             ps1.setInt(8, defaultNotificationValue);
                 ps1.setInt(7, quantity);
            ps1. executeUpdate();
@@ -413,7 +413,7 @@ while(true)
             System.out.println("Invalid item id");
             continue;
         }
-        System.out.println(selectItemIds);
+    
         if(!selectItemIds.contains(itemId))
         {
             System.out.println("No such item id");
@@ -546,7 +546,7 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
-             int defaultNotificationValue=1;
+             int defaultNotificationValue=2;
             ps1.setInt(8, defaultNotificationValue);
                 ps1.setInt(7, quantity);
            ps1. executeUpdate();
@@ -861,7 +861,7 @@ while(true)
             ps1.setString(4,address);
             ps1.setString(5,paymentStatus);
             ps1.setDouble(6, finalAmount);
-             int defaultNotificationValue=1;
+             int defaultNotificationValue=2;
             ps1.setInt(8, defaultNotificationValue);
                 ps1.setInt(7, quantity);
            ps1. executeUpdate();

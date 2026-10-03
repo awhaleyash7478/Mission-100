@@ -36,42 +36,48 @@ public class DeliveryPartnerDashboard {
             e.printStackTrace();
         }
         try {
-            
-       String query="select a.address as cus,a.order_id as ord, r.address as res from appOrders a join restaurant_registration r on a.res_id=r.res_id  where delivery_partner_id=? and a.notification_id is null";
+            int defaultNotificationValue=1;
+            String defaultStatusValue="Food Prepared";
+       String query="select a.address as cus,a.order_id as ord, r.address as res from appOrders a join restaurant_registration r on a.res_id=r.res_id   and a.notification_id =? and a.order_status = ?";
             PreparedStatement ps=conn.prepareStatement(query);
-                 ps.setInt(1, delivery_partner_id);
+            ps.setInt(1, defaultNotificationValue);
+            ps.setString(2, defaultStatusValue);
+                
             ResultSet rs=ps.executeQuery();
             int found=0;
             while(rs.next())
             {
                 found=1;
-                res_add=rs.getString("cus");
-                cus_add=rs.getString("res");
+                res_add=rs.getString("res");
+                cus_add=rs.getString("cus");
                 order_id=rs.getInt("ord");
 
-
-                System.out.println("Order id: "+order_id);
+               
+                System.out.println("\nOrder id: "+order_id);
                 System.out.println("Pickup Location: "+res_add);
                 System.out.println("Delivery Location: "+cus_add);
                 orderId.add(order_id);
-                System.out.println(orderId);
+               
 
      
   
 
         } 
         if(found==0)
+        {
         System.out.println("No avaiable deliveries");
     return ;
+        }
         }catch (Exception e) {
             e.printStackTrace();
         }
         while(true)
         {
-        System.out.println("1.Accept Delivery          2.Exit");
+        System.out.println("\n1.Accept Delivery          2.Exit");
         int choice=0;
         try {
             choice=sc.nextInt();
+            sc.nextLine();
         } catch (Exception e) {
             System.out.println("Pls enter the valid option no.[eg: 2 for Exit]");
             continue;
@@ -82,6 +88,11 @@ public class DeliveryPartnerDashboard {
             {
             System.out.print("Order id: ");
             int enteredOrderId=0;
+            try {
+                enteredOrderId=sc.nextInt();
+            } catch (Exception e) {
+          System.out.println("Pls enter the valid order id");
+        continue;           }
             if(!orderId.contains(enteredOrderId))
             {
                 System.out.println("No such Order id");
@@ -113,6 +124,13 @@ public class DeliveryPartnerDashboard {
             }
 
         }
+        }else if(choice==2)
+        {
+            return ;
+        }else 
+        {
+            System.out.println("Invalid choice allowed is 1 and 2");
+            continue;
         }
     }
 
@@ -145,8 +163,8 @@ int found=0;
             while(rs.next())
             {
                  found=1;
-                res_add=rs.getString("cus");
-                cus_add=rs.getString("res");
+                res_add=rs.getString("res");
+                cus_add=rs.getString("cus");
                 order_id=rs.getInt("ord");
 
                 System.out.println("\nOrder id: "+order_id);
